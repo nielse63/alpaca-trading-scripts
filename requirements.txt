@@ -1,0 +1,9 @@
+alpaca-trade-api==1.2.2
+yfinance==0.1.59
+python-dotenv==0.18.0
+loguru==0.5.3
+requests-cache==0.6.4
+requests==2.25.1
+pandas==1.2.4
+ta==0.7.0
+setuptools==57.0.0

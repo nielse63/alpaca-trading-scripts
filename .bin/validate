@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -e
+
+source activate
+isort trading_scripts ./*.py
+black trading_scripts ./*.py
+flake8 trading_scripts ./*.py
+mypy trading_scripts ./*.py

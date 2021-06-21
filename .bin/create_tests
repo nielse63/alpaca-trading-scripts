@@ -1,0 +1,80 @@
+#!/usr/bin/env python
+import os
+import pathlib
+import re
+
+root = pathlib.Path(__file__).parent.parent
+src = root / "trader"
+EXCLUDE_FILES = ["cli.py", "runner.py", "enums.py", 'logger.py']
+
+
+def find_files_in_directory(dirpath):
+    with os.scandir(dirpath) as it:
+        output = []
+        for entry in it:
+            if (
+                entry.name.startswith(".")
+                or entry.name.startswith("__pycache__")
+                or entry.name.startswith("__init__")
+            ):
+                continue
+
+            if entry.is_dir():
+                output.extend(find_files_in_directory(entry.path))
+
+            elif entry.name.endswith(".py") and entry.is_file():
+                output.append(pathlib.Path(entry.path))
+    return output
+
+
+template = """
+import pytest
+from .conftest import MockHistory
+from {{name}} import *
+
+def sample_test():
+    # do something there
+    pass
+"""
+
+
+def create_new_tests():
+    py_files = find_files_in_directory(src)
+    for file in py_files:
+        relative_path = file.relative_to(src)
+        if relative_path in EXCLUDE_FILES:
+            continue
+        path = str(relative_path).replace("/", "_")
+        test_filepath = pathlib.Path(__file__).parent.parent / "tests" / f"test_{path}"
+        if test_filepath.exists():
+            continue
+
+        module_name = "trader." + str(relative_path).replace("/", ".").replace(
+            ".py", ""
+        )
+        file_content = template.replace("{{name}}", module_name)
+        with open(test_filepath, "w+") as f:
+            f.write(file_content)
+        print(f"Created new test file at {test_filepath.relative_to(root)}")
+
+
+def remote_old_tests():
+    test_dir = root / "tests"
+    for entry in test_dir.iterdir():
+        if (
+            not entry.is_file()
+            or not entry.name.endswith(".py")
+            or not entry.name.startswith("test_")
+        ):
+            continue
+        src_basename = re.sub(r"^test_", "", entry.name)
+        src_basename = re.sub(r"_", "/", src_basename)
+        src_file = src / src_basename
+        if not src_file.exists():
+            entry.unlink()
+            print(f"Deleted old test file {entry.name}")
+
+
+if __name__ == "__main__":
+    create_new_tests()
+    remote_old_tests()

@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+set -e
+
+source .env
+source activate
+
+# .bin/validate
+
+rsync -avzrptl \
+    --exclude="__pycache__" \
+    --exclude=".git" \
+    --exclude="venv" \
+    --exclude="_old" \
+    --exclude="docs" \
+    --exclude="*.egg-info" \
+    --exclude=".mypy_cache" \
+    --exclude=".pytest_cache" \
+    --exclude="*coverage*" \
+    --exclude="htmlcov" \
+    --exclude=".github" \
+    --exclude=".vscode" \
+    --exclude="data" \
+    --exclude="logs/" \
+    --exclude="build/" \
+    --exclude="tests/" \
+    --exclude="node_modules/" \
+    --exclude="dist/" \
+    --exclude="activate" \
+    --exclude="*.code-workspace" \
+    --exclude=".DS_Store" \
+    --exclude="*.cache" \
+    --del \
+    ./ \
+    $SSH_AUTH:$SSH_PATH

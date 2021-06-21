@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+set -e
+
+# cleanup
+rm -rf \
+  venv/ \
+  ./*.egg-info \
+  .mypy_cache \
+  .pytest_cache \
+  ./*.cache \
+  activate \
+  .coverage \
+  .coverage.xml \
+  htmlcov
+
+python3 -m venv venv
+if [ ! -f "activate" ]; then
+  ln -s venv/bin/activate activate
+fi
+source activate
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+pip install -r requirements-dev.txt
+python setup.py develop
+
+# install git hooks
+if [ -d  ".git" ]; then
+  for f in .bin/hooks/*; do
+    cp -v $f ".git/hooks/$(basename $f)"
+  done
+fi
