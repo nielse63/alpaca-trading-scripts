@@ -1,0 +1,41 @@
+{
+  "editor.trimAutoWhitespace": true,
+  "files.trimTrailingWhitespace": true,
+  "files.eol": "\n",
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+  "files.exclude": {
+    "**/venv": true,
+    "**/*.egg-info": true,
+    "**/__pycache__": true,
+    "**/*.*_cache": true,
+    "htmlcov": true
+  },
+  "search.exclude": {
+    "**/data/**": true
+  },
+  "python.formatting.provider": "black",
+  "python.linting.flake8Enabled": true,
+  "python.linting.pylintEnabled": false,
+  "python.sortImports.path": "isort",
+  "python.linting.mypyEnabled": true,
+  "python.linting.enabled": true,
+  "python.pythonPath": "venv/bin/python3",
+  "[python]": {
+    "gitlens.codeLens.symbolScopes": ["!Module"],
+    "editor.wordBasedSuggestions": false,
+    "editor.defaultFormatter": "ms-python.python"
+  },
+  "python.formatting.blackArgs": ["--line-length=88"],
+  "python.formatting.blackPath": "venv/bin/black",
+  "python.linting.flake8Path": "venv/bin/flake8",
+  "python.linting.maxNumberOfProblems": 50,
+  "python.linting.mypyPath": "venv/bin/mypy",
+  "python.linting.mypyArgs": [],
+  "files.watcherExclude": {
+    "**/.cache/**": true,
+    "**/data/**": true,
+    "**/logs/**": true,
+    "**/venv/**": true
+  }
+}

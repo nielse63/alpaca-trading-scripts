@@ -1,0 +1,33 @@
+#!/usr/bin/env python3
+import pathlib
+import re
+
+filename = pathlib.Path(__file__).parent.parent / ".env"
+
+if not filename.exists():
+    raise FileNotFoundError(f".env file not found at {filename}")
+
+with open(filename) as f:
+    content = f.readlines()
+
+new_content = []
+is_ignoring = False
+for line in content:
+    if line.startswith("#"):
+        continue
+    if not is_ignoring and "ignore_start" in line:
+        is_ignoring = True
+    if is_ignoring and "ignore_end" in line:
+        is_ignoring = False
+        continue
+    if is_ignoring:
+        continue
+    new_line = re.sub(r"'", '"', line).strip()
+    new_line = re.sub(r"\"(.*?)\"", '""', new_line)
+    new_content.append(new_line)
+new_file_content = "\n".join(new_content).strip()
+
+output_file = pathlib.Path(__file__).parent.parent / ".env.sample"
+with open(output_file, "w") as f:
+    f.write(new_file_content)
+print(".env.sample update complete")
