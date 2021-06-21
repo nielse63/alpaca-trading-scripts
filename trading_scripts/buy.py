@@ -31,55 +31,68 @@ if not os.getenv("APCA_API_KEY_ID"):
 if not os.getenv("APCA_API_SECRET_KEY"):
     raise Exception("APCA_API_SECRET_KEY is undefined")
 
-# create an alpaca client
-logger.info("Creating alpaca client")
-api = alpaca.REST()
 
+def main():
 
-# get open positions
-logger.info("Getting open positions")
-positions = get_position_symbols(api)
-logger.info(f"Open positions: {', '.join(positions)}")
-if TICKER_SYMBOL in positions:
-    logger.warning("already owned - exiting")
-    sys.exit()
+    # create an alpaca client
+    logger.info("Creating alpaca client")
+    api = alpaca.REST()
 
-# close any open buy orders
-for order in api.list_orders(status="open"):
-    if order.symbol == TICKER_SYMBOL and order.side == "buy":
-        try:
-            api.cancel_order(order.id)
-        except Exception as error:
-            logger.exception(error)
+    # get open positions
+    logger.info("Getting open positions")
+    positions = get_position_symbols(api)
+    if len(positions):
+        logger.info(f"Open positions: {', '.join(positions)}")
+        if TICKER_SYMBOL in positions:
+            logger.warning("already owned - exiting")
             sys.exit()
 
-# get historical data
-logger.info("Getting historical data")
-last_quote = api.get_last_quote(TICKER_SYMBOL)
-data = get_historical_data(TICKER_SYMBOL, interval="1d", period="1y")
-close = data["Close"]
+    # close any open buy orders
+    for order in api.list_orders(status="open"):
+        if order.symbol == TICKER_SYMBOL and order.side == "buy":
+            logger.info(f"Cancelling order id {order.id}")
+            try:
+                api.cancel_order(order.id)
+            except Exception as error:
+                logger.exception(error)
+                sys.exit()
+            logger.success(f"Cancelled order id {order.id}")
 
-# calculate sma(10) and sma(25)
-sma_fast = SMAIndicator(close, window=10).sma_indicator()
-sma_slow = SMAIndicator(close, window=25).sma_indicator()
-# here's our strategy - when sma(10) > sma(25), enter long
-if not (sma_fast > sma_slow).iloc[-1]:
-    logger.warning("Entry signal was not met - exiting")
-    sys.exit()
+    # get historical data
+    logger.info("Getting historical data")
+    last_quote = api.get_last_quote(TICKER_SYMBOL)
+    data = get_historical_data(TICKER_SYMBOL, interval="1d", period="1y")
+    close = data["Close"]
 
-# calculate number of shares to buy
-account = api.get_account()
-last_price = float(last_quote.askprice)
-cash_for_trade = float(account.cash) * EQUITY_PCT_PER_TRADE
-qty = cash_for_trade / last_price
+    # calculate sma(10) and sma(25)
+    sma_fast = SMAIndicator(close, window=10).sma_indicator()
+    sma_slow = SMAIndicator(close, window=25).sma_indicator()
+    # here's our strategy - when sma(10) > sma(25), enter long
+    if not (sma_fast > sma_slow).iloc[-1]:
+        logger.warning("Entry signal was not met - exiting")
+        sys.exit()
 
-# create a market buy order
-try:
-    order = api.submit_order(
-        symbol=TICKER_SYMBOL, qty=qty, side="buy", type="market", time_in_force="day"
-    )
-except Exception as error:
-    logger.exception(f"Error: {error}")
-    sys.exit()
+    # calculate number of shares to buy
+    account = api.get_account()
+    last_price = float(last_quote.askprice)
+    cash_for_trade = float(account.cash) * EQUITY_PCT_PER_TRADE
+    qty = cash_for_trade / last_price
 
-logger.success(f"Order to buy {qty} shares of {TICKER_SYMBOL} at {last_price}")
+    # create a market buy order
+    try:
+        order = api.submit_order(
+            symbol=TICKER_SYMBOL,
+            qty=qty,
+            side="buy",
+            type="market",
+            time_in_force="day",
+        )
+    except Exception as error:
+        logger.exception(f"Error: {error}")
+        sys.exit()
+
+    logger.success(f"Order to buy {qty} shares of {TICKER_SYMBOL} at {last_price}")
+
+
+if __name__ == "__main__":
+    main()
