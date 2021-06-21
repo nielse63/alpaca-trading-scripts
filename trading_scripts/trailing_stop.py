@@ -3,32 +3,17 @@
 create or update a trailing stop order for each open position.
 the stop value should be based on the n14 average true rate.
 """
-import os
-
-import alpaca_trade_api as alpaca
 from alpaca_trade_api.rest import Order, Position
-from dotenv import load_dotenv
 
-from trading_scripts.helpers import average_true_range, get_historical_data
-from trading_scripts.logger import logger
-
-load_dotenv()
-
-# variables
-TICKER_SYMBOL = "AAPL"  # the assets ticket symbol
-EQUITY_PCT_PER_TRADE = 0.5  # percent of available equity we can use for the purchase
-
-# validate env vars
-logger.info("Checking env vars")
-if not os.getenv("APCA_API_KEY_ID"):
-    raise Exception("APCA_API_KEY_ID is undefined")
-if not os.getenv("APCA_API_SECRET_KEY"):
-    raise Exception("APCA_API_SECRET_KEY is undefined")
-
+from trading_scripts.utils.helpers import (  # validate_env_vars,
+    average_true_range,
+    create_client,
+    get_historical_data,
+)
+from trading_scripts.utils.logger import logger
 
 # create an alpaca client
-logger.info("Creating alpaca client")
-api = alpaca.REST()
+api = create_client()
 
 
 def get_orders_for_symbol(symbol: str):
@@ -41,6 +26,11 @@ def get_orders_for_symbol(symbol: str):
 
 
 def replace_existin_order(order: Order, stop_price: float, trail_price: float):
+    if order.trail_price < trail_price:
+        logger.info(
+            f"Existing trail price of {order.trail_price} is less than {trail_price}"
+        )
+        return
     logger.info("Replacing trailing stop loss order")
     try:
         new_order = api.replace_order(
@@ -60,7 +50,7 @@ def create_new_tsl_order(symbol: str, qty: float, trail_price: float) -> None:
             symbol=symbol,
             type="trailing_stop",
             qty=qty,
-            time_in_force="day",
+            time_in_force="gtc",
             trail_price=trail_price,
         )
         # print(order)
@@ -99,8 +89,12 @@ def set_trailing_stop_loss(position: Position) -> None:
 
 def main():
     # get open positions
-    for position in api.list_positions():
-        set_trailing_stop_loss(position)
+    positions = api.list_positions()
+    if not len(positions):
+        logger.info("No open positions - exiting")
+    else:
+        for position in positions:
+            set_trailing_stop_loss(position)
 
 
 if __name__ == "__main__":

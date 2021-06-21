@@ -13,14 +13,14 @@ with open(filename) as f:
 new_content = []
 is_ignoring = False
 for line in content:
-    if line.startswith("#"):
-        continue
     if not is_ignoring and "ignore_start" in line:
         is_ignoring = True
     if is_ignoring and "ignore_end" in line:
         is_ignoring = False
         continue
     if is_ignoring:
+        continue
+    if line.startswith("#") or line == "":
         continue
     new_line = re.sub(r"'", '"', line).strip()
     new_line = re.sub(r"\"(.*?)\"", '""', new_line)

@@ -1,0 +1,7 @@
+name: "CodeQL config"
+paths:
+  - trading_scripts
+paths-ignore:
+  - .bin
+  - venv
+  - tests
