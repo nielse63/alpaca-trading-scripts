@@ -12,3 +12,5 @@ numpy==1.21.0
 stockstats==0.3.2
 # scipy==
 # matplotlib==
+backtesting==0.3.1
+tabulate==0.8.9
