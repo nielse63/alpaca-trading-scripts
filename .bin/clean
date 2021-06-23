@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -e
+
+# exit venv if possible
+$(command -v deactivate) && deactivate
+
+# cleanup
+rm -rf \
+  venv/ \
+  ./*.egg-info \
+  .mypy_cache \
+  .pytest_cache \
+  .cache/ \
+  logs/ \
+  activate \
+  .coverage \
+  .coverage.xml \
+  htmlcov
+
+# remove all __pycache__ folders
+find trading_scripts -name __pycache__ -type d -print0 | xargs -0 /bin/rm -rf

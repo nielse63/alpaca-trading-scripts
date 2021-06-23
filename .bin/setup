@@ -1,18 +1,6 @@
 #!/usr/bin/env bash
 set -e
 
-# cleanup
-rm -rf \
-  venv/ \
-  ./*.egg-info \
-  .mypy_cache \
-  .pytest_cache \
-  ./*.cache \
-  activate \
-  .coverage \
-  .coverage.xml \
-  htmlcov
-
 python3 -m venv venv
 if [ ! -f "activate" ]; then
   ln -s venv/bin/activate activate

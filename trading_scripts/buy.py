@@ -7,91 +7,80 @@
 3. get historical data of the asset and latest ask price, test that sma(10) > sma(25) - if not, exit
 4. submit a market order to buy
 """
+from stockstats import StockDataFrame
 
-import os
-import sys
-
-import alpaca_trade_api as alpaca
-from dotenv import load_dotenv
-from ta.trend import SMAIndicator
-
-from trading_scripts.helpers import get_historical_data, get_position_symbols
-from trading_scripts.logger import logger
-
-load_dotenv()
-
-# variables
-TICKER_SYMBOL = "AAPL"  # the assets ticket symbol
-EQUITY_PCT_PER_TRADE = 0.5  # percent of available equity we can use for the purchase
-
-# validate env vars
-logger.info("Checking env vars")
-if not os.getenv("APCA_API_KEY_ID"):
-    raise Exception("APCA_API_KEY_ID is undefined")
-if not os.getenv("APCA_API_SECRET_KEY"):
-    raise Exception("APCA_API_SECRET_KEY is undefined")
+from trading_scripts.utils.constants import EQUITY_PCT_PER_TRADE, TICKER_SYMBOL
+from trading_scripts.utils.helpers import (
+    create_client,
+    get_historical_data,
+    get_position_symbols,
+    validate_env_vars,
+)
+from trading_scripts.utils.logger import logger
 
 
-def main():
-
+def buy_for_symbol(symbol: str):
     # create an alpaca client
-    logger.info("Creating alpaca client")
-    api = alpaca.REST()
+    api = create_client()
 
     # get open positions
     logger.info("Getting open positions")
-    positions = get_position_symbols(api)
-    if len(positions):
-        logger.info(f"Open positions: {', '.join(positions)}")
-        if TICKER_SYMBOL in positions:
-            logger.warning("already owned - exiting")
-            sys.exit()
+    symbols = get_position_symbols()
+    logger.info(f"Open positions: {', '.join(symbols)}")
+    if symbol in symbols:
+        logger.warning("already owned - exiting")
+        return
 
     # close any open buy orders
-    for order in api.list_orders(status="open"):
-        if order.symbol == TICKER_SYMBOL and order.side == "buy":
-            logger.info(f"Cancelling order id {order.id}")
+    for open_order in api.list_orders(status="open"):
+        if open_order.symbol == symbol and open_order.side == "buy":
+            logger.info(f"Cancelling order id {open_order.id}")
             try:
-                api.cancel_order(order.id)
+                api.cancel_order(open_order.id)
             except Exception as error:
                 logger.exception(error)
-                sys.exit()
-            logger.success(f"Cancelled order id {order.id}")
+                return
+            logger.success(f"Cancelled order id {open_order.id}")
 
     # get historical data
     logger.info("Getting historical data")
-    last_quote = api.get_last_quote(TICKER_SYMBOL)
-    data = get_historical_data(TICKER_SYMBOL, interval="1d", period="1y")
-    close = data["Close"]
+    last_quote = api.get_last_quote(symbol)
+    data = get_historical_data(symbol, interval="1d", period="1y")
+    stock = StockDataFrame.retype(data.copy())
 
     # calculate sma(10) and sma(25)
-    sma_fast = SMAIndicator(close, window=10).sma_indicator()
-    sma_slow = SMAIndicator(close, window=25).sma_indicator()
+    sma_fast = stock.get("close_10_sma")
+    sma_slow = stock.get("close_25_sma")
     # here's our strategy - when sma(10) > sma(25), enter long
-    if not (sma_fast > sma_slow).iloc[-1]:
+    if not sma_fast.gt(sma_slow).iloc[-1]:
         logger.warning("Entry signal was not met - exiting")
-        sys.exit()
+        return
 
     # calculate number of shares to buy
     account = api.get_account()
     last_price = float(last_quote.askprice)
     cash_for_trade = float(account.cash) * EQUITY_PCT_PER_TRADE
     qty = cash_for_trade / last_price
+    logger.info(f"Buying {qty} of {symbol} at {last_price}")
 
     # create a market buy order
     try:
-        order = api.submit_order(
-            symbol=TICKER_SYMBOL,
+        buy_order = api.submit_order(
+            symbol=symbol,
             qty=qty,
             side="buy",
             type="market",
             time_in_force="day",
         )
+        logger.success(f"Order to buy {qty} shares of {symbol} at {last_price}")
+        logger.debug(f"buy_order:\n{buy_order}")
     except Exception as error:
-        logger.exception(f"Error: {error}")
-        sys.exit()
+        logger.error(f"Error:\n{error}")
 
-    logger.success(f"Order to buy {qty} shares of {TICKER_SYMBOL} at {last_price}")
+
+def main():
+    validate_env_vars()
+    buy_for_symbol(TICKER_SYMBOL)
 
 
 if __name__ == "__main__":
