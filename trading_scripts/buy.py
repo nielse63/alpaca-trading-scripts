@@ -19,7 +19,7 @@ from trading_scripts.utils.helpers import (
 )
 from trading_scripts.utils.logger import logger
 
-load_dotenv
+load_dotenv()
 
 
 def buy_for_symbol(symbol: str):
