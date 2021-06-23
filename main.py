@@ -14,7 +14,6 @@ def main():
 
     logger.info("Starting main run")
 
-    validate_env_vars()
     trailing_stop()
     buy()
 
@@ -23,4 +22,5 @@ def main():
 
 if __name__ == "__main__":
     load_dotenv()
+    validate_env_vars()
     main()

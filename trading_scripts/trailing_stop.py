@@ -3,12 +3,18 @@
 create or update a trailing stop order for each open position.
 the stop value should be based on the n14 average true rate.
 """
-from alpaca_trade_api.rest import Order, Position
+import math
 
-from trading_scripts.utils.helpers import (  # validate_env_vars,
-    average_true_range,
+from alpaca_trade_api.rest import Order, Position
+from stockstats import StockDataFrame
+
+from trading_scripts.utils.constants import ATR_MULTIPLIER
+from trading_scripts.utils.helpers import (
     create_client,
     get_historical_data,
+    get_last_quote,
+    get_trailing_stop_orders,
+    validate_env_vars,
 )
 from trading_scripts.utils.logger import logger
 
@@ -16,86 +22,93 @@ from trading_scripts.utils.logger import logger
 api = create_client()
 
 
-def get_orders_for_symbol(symbol: str):
-    orders = api.list_orders(status="open", symbols=[symbol])
-    output = []
-    for order in orders:
-        if order.side == "sell" and order.type == "trailing_stop":
-            output.append(order)
-    return output
+data_cache = {}
 
 
-def replace_existin_order(order: Order, stop_price: float, trail_price: float):
-    if order.trail_price < trail_price:
+def get_data_for_symbol(symbol: str):
+    if symbol not in data_cache:
+        data_cache[symbol] = get_historical_data(
+            symbol=symbol, interval="30m", period="5d"
+        )
+    return data_cache[symbol]
+
+
+def calculate_trail_stop_price(order: Order):
+    data = get_data_for_symbol(order.symbol)
+    share_price = get_last_quote(order.symbol)
+    stock = StockDataFrame.retype(data.copy())
+    atr = stock.get("atr").iloc[-1]
+    stop_price = share_price - atr * ATR_MULTIPLIER
+    trail_price = share_price - stop_price
+    logger.debug(
+        f"share_price: {share_price}, stop_price: {stop_price}; atr: {atr}, trail_price: {trail_price}"
+    )
+    return [stop_price, trail_price]
+
+
+def replace_existing_order(order: Order):
+    stop_price, trail_price = calculate_trail_stop_price(order)
+    if order.stop_price > stop_price:
         logger.info(
-            f"Existing trail price of {order.trail_price} is less than {trail_price}"
+            f"Existing stop price of {order.stop_price} is greater than {stop_price}"
         )
         return
     logger.info("Replacing trailing stop loss order")
     try:
-        new_order = api.replace_order(
-            order_id=order.id, stop_price=stop_price, trail=trail_price
+        sell_order = api.replace_order(
+            order_id=order.id,
+            stop_price=stop_price,
+            trail=trail_price,
         )
-        # print(new_order)
+        logger.debug(sell_order)
     except Exception as error:
-        logger.error(f"Error: {error}")
+        logger.error(f"Error:\n{error}")
         return
-    logger.success(f"Replaced order with new order id: {new_order.id}")
+    logger.success(f"Replaced order with new order id: {sell_order.id}")
 
 
-def create_new_tsl_order(symbol: str, qty: float, trail_price: float) -> None:
+def create_new_tsl_order(position: Position) -> None:
+    _, trail_price = calculate_trail_stop_price(position)
+
     try:
-        order = api.submit_order(
+        sell_order = api.submit_order(
             side="sell",
-            symbol=symbol,
+            symbol=position.symbol,
             type="trailing_stop",
-            qty=qty,
+            qty=math.floor(float(position.qty)),
             time_in_force="gtc",
             trail_price=trail_price,
         )
-        # print(order)
+        logger.debug(f"new trailing stop order:\n{sell_order}")
+        logger.success(
+            f"Created new order for {sell_order.symbol} trail price: {trail_price}"
+        )
     except Exception as error:
-        logger.error(f"Error: {error}")
-        return
-    logger.success(f"Created new order with new order id: {order.id}")
+        logger.error(f"Error:\n{error}")
 
 
 def set_trailing_stop_loss(position: Position) -> None:
-    # get data for position
     symbol = position.symbol
-    data = get_historical_data(symbol=symbol)
-    share_price = float(api.get_last_quote(symbol).askprice)
-    qty = float(position.qty)
-
-    # calulate stop loss price
-    atr = average_true_range(data, 14)[-1]
-    stop_loss_multiplier = 2
-    stop_price = share_price - atr * stop_loss_multiplier
-    trail_price = share_price - stop_price
-
-    # compare to existing sell orders
-    orders = get_orders_for_symbol(symbol)
-    if len(orders) > 1:
-        logger.warning(
-            f"There are {len(orders)} open trailing stop orders for {symbol} - not sure what to do so returning for now"
-        )
-    elif len(orders):
-        replace_existin_order(
-            order=orders[0], stop_price=stop_price, trail_price=trail_price
-        )
+    orders = get_trailing_stop_orders(symbol)
+    if len(orders):
+        for order in orders:
+            logger.info(f"replacing open trailing stop  order for {symbol}")
+            replace_existing_order(order)
     else:
-        create_new_tsl_order(symbol=symbol, qty=qty, trail_price=trail_price)
+        logger.info(f"creating new trailing stop  order for {symbol}")
+        create_new_tsl_order(position)
 
 
 def main():
     # get open positions
     positions = api.list_positions()
-    if not len(positions):
-        logger.info("No open positions - exiting")
-    else:
-        for position in positions:
-            set_trailing_stop_loss(position)
+    logger.info(
+        f"Updating trailing stop losses for orders: {' '.join(position.symbol for  position in positions)}"
+    )
+    for position in positions:
+        set_trailing_stop_loss(position)
 
 
 if __name__ == "__main__":
+    validate_env_vars()
     main()

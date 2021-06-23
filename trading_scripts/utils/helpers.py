@@ -6,9 +6,13 @@ import alpaca_trade_api as alpaca
 import numpy as np
 import pandas as pd
 import yfinance as yf
+from alpaca_trade_api.rest import Position
+from dotenv import load_dotenv
 from requests_cache import CachedSession
 
 from trading_scripts.utils.logger import logger
+
+load_dotenv()
 
 
 class Cache(object):
@@ -18,13 +22,14 @@ class Cache(object):
 def create_client() -> alpaca.REST:
     if not Cache.API_CLIENT:
         logger.debug("Creating alpaca client")
-        api = alpaca.REST()
-        Cache.API_CLIENT = api
+        Cache.API_CLIENT = alpaca.REST()
     return Cache.API_CLIENT
 
 
+api = create_client()
+
+
 def is_market_open() -> bool:
-    api = create_client()
     return api.get_clock().is_open
 
 
@@ -45,10 +50,13 @@ def get_requests_cache() -> CachedSession:
     )
 
 
+def get_positions() -> list[Position]:
+    return api.list_positions()
+
+
 def get_position_symbols() -> list[str]:
-    api = create_client()
     output = []
-    for position in api.list_positions():
+    for position in get_positions():
         output.append(position.symbol)
     return output
 
@@ -66,3 +74,21 @@ def average_true_range(data: pd.DataFrame, period: int = 14):
     true_range = np.max(ranges, axis=1)
     atr = true_range.rolling(period).sum() / period
     return atr
+
+
+def SMA(data: pd.Series, n: int) -> pd.Series:
+    return pd.Series(data).rolling(n).mean()
+
+
+def get_trailing_stop_orders(symbol: str) -> list:
+    orders = api.list_orders(status="open", symbols=[symbol])
+    output = filter(
+        lambda order: order.side == "sell" and order.type == "trailing_stop", orders
+    )
+    return list(output)
+
+
+def get_last_quote(symbol: str) -> float:
+    barset = api.get_barset(symbol, "1Min", limit=2)
+    share_price = barset[symbol][-1].c
+    return float(share_price)

@@ -9,6 +9,7 @@
     "**/*.egg-info": true,
     "**/__pycache__": true,
     "**/*.*_cache": true,
+    "**/.cache": true,
     "htmlcov": true
   },
   "search.exclude": {
