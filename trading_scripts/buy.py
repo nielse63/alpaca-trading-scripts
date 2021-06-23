@@ -7,6 +7,7 @@
 3. get historical data of the asset and latest ask price, test that sma(10) > sma(25) - if not, exit
 4. submit a market order to buy
 """
+from dotenv.main import load_dotenv
 from stockstats import StockDataFrame
 
 from trading_scripts.utils.constants import EQUITY_PCT_PER_TRADE, TICKER_SYMBOL
@@ -17,6 +18,8 @@ from trading_scripts.utils.helpers import (
     validate_env_vars,
 )
 from trading_scripts.utils.logger import logger
+
+load_dotenv
 
 
 def buy_for_symbol(symbol: str):
