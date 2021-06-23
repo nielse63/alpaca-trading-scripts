@@ -8,7 +8,7 @@ flake8 trading_scripts ./*.py
 mypy trading_scripts ./*.py
 
 # find extra dependencies that aren't needed
-pip-extra-reqs trading_scripts/
+pip-extra-reqs --ignore-requirement=tabulate trading_scripts/
 
 # find dead code
-vulture --min-confidence=0 trading_scripts main.py
+# vulture --min-confidence=0 trading_scripts main.py
