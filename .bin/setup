@@ -5,11 +5,11 @@ python3 -m venv venv
 if [ ! -f "activate" ]; then
   ln -s venv/bin/activate activate
 fi
-source activate
+. activate
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 pip install -r requirements-dev.txt
-python setup.py develop
+python3 setup.py develop
 
 # install git hooks
 if [ -d  ".git" ]; then

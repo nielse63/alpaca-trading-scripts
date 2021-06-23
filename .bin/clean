@@ -12,6 +12,7 @@ rm -rf \
   .pytest_cache \
   .cache/ \
   logs/ \
+  dist/ \
   activate \
   .coverage \
   .coverage.xml \
