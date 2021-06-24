@@ -11,6 +11,7 @@ load_dotenv()
 def main():
     if not is_market_open():
         return
+
     validate_env_vars()
 
     # buy

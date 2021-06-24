@@ -48,7 +48,7 @@ class Buyer:
 
     @property
     def symbol_is_in_portfolio(self):
-        return self.symbol in self.positions
+        return self.symbol in self.position_symbols
 
     def submit_order(
         self,
@@ -102,52 +102,6 @@ class Buyer:
         distance_to_stop = last_price / self.get_drawdown_points(ATR_MULTIPLIER)
         position_qty = (available_cash * risk_pct) / distance_to_stop
         return math.floor(position_qty)
-
-    def buy(self):
-        log.debug("Buyer#buy")
-
-        # create a new buy order
-        try:
-            qty = self.calc_position_size()
-            order = self.api.submit_order(
-                symbol=self.symbol,
-                side="buy",
-                type="market",
-                qty=qty,
-                time_in_force="day",
-            )
-            print(order)
-        except Exception as error:
-            log.error("ERROR")
-            print(error)
-            return
-
-        # wait until the order is filled
-        while order.status != "filled":
-            sleep(0.1)
-            order = self.api.get_order(order.id)
-        log.success("Buy order filled")
-        print(order._raw)
-
-        # create trailing stop loss order
-        try:
-            trail_price = self.get_trailing_stop_loss_points(
-                float(order.filled_avg_price)
-            )
-            sell_order = self.submit_order(
-                side="sell",
-                type="trailing_stop",
-                time_in_force="gtc",
-                trail_price=trail_price,
-                qty=order.qty,
-            )
-            log.success("Trailing Stop order created")
-            log.info(
-                f"HWM: {sell_order.hwm}, Trail Price: {sell_order.trail_price}, Stop Price: {sell_order.stop_price}"
-            )
-        except Exception as error:
-            log.error("ERROR")
-            print(error)
 
     def create_buy_order(self) -> alpaca.Order:
         log.debug("Buyer#create_buy_order")
