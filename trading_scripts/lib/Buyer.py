@@ -6,6 +6,7 @@ import pandas as pd
 from stockstats import StockDataFrame
 
 from trading_scripts.utils.constants import (
+    ATR_MULTIPLIER,
     HISTORICAL_DATA_INTERVAL,
     HISTORICAL_DATA_PERIOD,
     MAX_DRAWDOWN_PCT,
@@ -14,13 +15,14 @@ from trading_scripts.utils.helpers import (
     create_client,
     get_historical_data,
     get_positions,
+    is_market_open,
 )
 from trading_scripts.utils.logger import log
 
 
-class Broker:
+class Buyer:
     symbol: str = ""
-    positions: list[str] = []
+    positions: list[dict] = []
     data: pd.DataFrame = None
     api: alpaca = None
 
@@ -97,12 +99,12 @@ class Broker:
         available_cash = self.available_cash
         risk_pct = 0.05
         last_price = self.last_price
-        distance_to_stop = last_price / self.get_drawdown_points(5)
+        distance_to_stop = last_price / self.get_drawdown_points(ATR_MULTIPLIER)
         position_qty = (available_cash * risk_pct) / distance_to_stop
         return math.floor(position_qty)
 
     def buy(self):
-        log.debug("Broker#buy")
+        log.debug("Buyer#buy")
 
         # create a new buy order
         try:
@@ -148,7 +150,7 @@ class Broker:
             print(error)
 
     def create_buy_order(self) -> alpaca.Order:
-        log.debug("Broker#create_buy_order")
+        log.debug("Buyer#create_buy_order")
 
         # create a new buy order
         try:
@@ -186,7 +188,11 @@ class Broker:
             log.error(f"ERROR: {error}")
 
     def run(self):
-        log.debug("Broker#run")
+        if not is_market_open():
+            print("Market is not open - preventing execution")
+            return
+
+        log.debug("Buyer#run")
         if self.symbol_is_in_portfolio:
             log.info(f"Preventing purchase of {self.symbol} - already in portfolio")
             return
@@ -212,8 +218,3 @@ class Broker:
 
         # create trailing stop loss order
         self.create_trailing_stop_loss_order(order)
-
-
-if __name__ == "__main__":
-    broker = Broker("AAPL")
-    broker.run()
