@@ -135,7 +135,7 @@ class Broker:
             sell_order = self.submit_order(
                 side="sell",
                 type="trailing_stop",
-                time_in_force="day",
+                time_in_force="gtc",
                 trail_price=trail_price,
                 qty=order.qty,
             )
