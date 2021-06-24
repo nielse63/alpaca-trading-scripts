@@ -3,7 +3,6 @@ import sys
 from datetime import timedelta
 
 import alpaca_trade_api as alpaca
-import numpy as np
 import pandas as pd
 import yfinance as yf
 from alpaca_trade_api.rest import Position
@@ -62,18 +61,9 @@ def get_position_symbols() -> list[str]:
 
 
 def get_historical_data(symbol: str, interval: str = "1d", period: str = "1y"):
+    logger.debug(f"getting data for {symbol}")
     session = get_requests_cache()
     return yf.Ticker(symbol).history(interval=interval, period=period, session=session)
-
-
-def average_true_range(data: pd.DataFrame, period: int = 14):
-    high_low = data["High"] - data["Low"]
-    high_close = np.abs(data["High"] - data["Close"].shift())
-    low_close = np.abs(data["Low"] - data["Close"].shift())
-    ranges = pd.concat([high_low, high_close, low_close], axis=1)
-    true_range = np.max(ranges, axis=1)
-    atr = true_range.rolling(period).sum() / period
-    return atr
 
 
 def SMA(data: pd.Series, n: int) -> pd.Series:

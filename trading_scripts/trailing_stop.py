@@ -6,6 +6,7 @@ the stop value should be based on the n14 average true rate.
 import math
 
 from alpaca_trade_api.rest import Order, Position
+from dotenv.main import load_dotenv
 from stockstats import StockDataFrame
 
 from trading_scripts.utils.constants import ATR_MULTIPLIER
@@ -17,6 +18,8 @@ from trading_scripts.utils.helpers import (
     validate_env_vars,
 )
 from trading_scripts.utils.logger import logger
+
+load_dotenv()
 
 # create an alpaca client
 api = create_client()
