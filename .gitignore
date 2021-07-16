@@ -131,3 +131,5 @@ dmypy.json
 # other
 activate
 *.cache
+logs/
+trading_scripts/__init__.py
