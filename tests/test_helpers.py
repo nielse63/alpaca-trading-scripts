@@ -141,7 +141,7 @@ def test_get_historical_data(mocker, mock_historical_data):
     )
     response = get_historical_data("AAPL")
     assert isinstance(response, pd.DataFrame)
-    mocked_method.assert_called_once_with(interval="1d", period="1y")
+    mocked_method.assert_called_once_with(interval="1h", period="3mo")
     columns = ["Open", "High", "Low", "Close", "Volume", "Dividends", "Stock Splits"]
     for column in columns:
         assert response[column] is not None
