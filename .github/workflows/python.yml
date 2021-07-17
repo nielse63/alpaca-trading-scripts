@@ -19,11 +19,17 @@ jobs:
     environment: github-actions
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
       - uses: actions/setup-python@v2
         with:
           python-version: "3.9" # Version range or exact version of a Python version to use, using SemVer's version range syntax
           architecture: "x64" # optional x64 or x86. Defaults to x64 if not specified
-      - run: .bin/setup
+      - run: .bin/setup-prod
       - run: .bin/validate
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

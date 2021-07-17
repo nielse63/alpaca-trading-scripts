@@ -17,3 +17,4 @@ exclude =
     venv,
     build,
     dist
+    __init__.py

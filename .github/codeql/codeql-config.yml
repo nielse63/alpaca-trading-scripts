@@ -5,3 +5,4 @@ paths-ignore:
   - .bin
   - venv
   - tests
+  - __pycache__

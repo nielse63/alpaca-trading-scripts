@@ -30,9 +30,6 @@ class Seller:
         return output
 
     def update_trailing_stop_loss_order(self, order: alpaca.Order) -> alpaca.Order:
-        if not is_market_open():
-            print("Market is not open - stopping execution")
-            return
         data = StockDataFrame.retype(
             get_historical_data(
                 order.symbol,
@@ -58,10 +55,18 @@ class Seller:
                 log.success("Order updated")
                 print(sell_order)
             else:
-                log.info(f"Not updating trailing stop order for {order.id}")
+                log.info(
+                    f"Not updating trailing stop order for {order.symbol} (id: {order.id})"
+                )
         except Exception as error:
             log.error(f"ERROR: {error}")
 
     def run(self):
+        log.info("Starting Seller.run")
+
+        # only run when market is open
+        if not is_market_open():
+            print("Market is not open - stopping execution")
+            return
         for order in self.get_orders():
             self.update_trailing_stop_loss_order(order)

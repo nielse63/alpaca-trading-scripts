@@ -9,7 +9,7 @@ from alpaca_trade_api.rest import Position
 from dotenv import load_dotenv
 from requests_cache import CachedSession
 
-from trading_scripts.utils.logger import logger
+from trading_scripts.utils.logger import logger as log
 
 load_dotenv()
 
@@ -20,7 +20,7 @@ class Cache(object):
 
 def create_client() -> alpaca.REST:
     if not Cache.API_CLIENT:
-        logger.debug("Creating alpaca client")
+        log.debug("Creating alpaca client")
         Cache.API_CLIENT = alpaca.REST()
     return Cache.API_CLIENT
 
@@ -33,11 +33,11 @@ def is_market_open() -> bool:
 
 
 def validate_env_vars():
-    logger.debug("Checking env vars")
+    log.debug("Checking env vars")
     required_vars = ["APCA_API_KEY_ID", "APCA_API_SECRET_KEY"]
     for var in required_vars:
         if not os.getenv(var):
-            logger.error("APCA_API_KEY_ID is undefined")
+            log.error("APCA_API_KEY_ID is undefined")
             sys.exit(1)
 
 
@@ -61,7 +61,7 @@ def get_position_symbols() -> list[str]:
 
 
 def get_historical_data(symbol: str, interval: str = "1d", period: str = "1y"):
-    logger.debug(f"getting data for {symbol}")
+    # log.debug(f"getting data for {symbol}")
     session = get_requests_cache()
     data = yf.Ticker(symbol, session=session)
     history = data.history(interval=interval, period=period)

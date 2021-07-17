@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
 set -e
 
-. activate
-isort trading_scripts ./*.py
-black trading_scripts ./*.py
-flake8 trading_scripts ./*.py
-mypy trading_scripts ./*.py
+venv/bin/isort trading_scripts ./*.py
+venv/bin/black trading_scripts ./*.py
+venv/bin/flake8 trading_scripts ./*.py
+venv/bin/mypy trading_scripts ./*.py
 
 # find extra dependencies that aren't needed
 # pip-extra-reqs --ignore-requirement=tabulate trading_scripts/

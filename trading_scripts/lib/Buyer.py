@@ -123,6 +123,9 @@ class Buyer:
         return order
 
     def create_trailing_stop_loss_order(self, buy_order: alpaca.Order):
+        if buy_order.status != "filled":
+            return
+
         # create trailing stop loss order
         try:
             trail_price = self.get_trailing_stop_loss_points(
@@ -142,18 +145,36 @@ class Buyer:
         except Exception as error:
             log.error(f"ERROR: {error}")
 
+    def clear_buy_orders(self):
+        orders = self.api.list_orders()
+        for order in orders:
+            if order.side == "buy" and order.status != "filled":
+                try:
+                    self.api.cancel_order(order.id)
+                    log.info(f"Cancelled open buy order for {order.symbol}")
+                except:
+                    log.warning(f"Failure to cancel open buy order: {order.id}")
+
     def run(self):
+        log.info("Starting Buyer.run")
+        self.clear_buy_orders()
+
+        # only run if market is open
         if not is_market_open():
             print("Market is not open - preventing execution")
             return
 
-        log.debug("Buyer#run")
         if self.symbol_is_in_portfolio:
             log.info(f"Preventing purchase of {self.symbol} - already in portfolio")
             return
 
         if not self.sma_crossover_signal():
             log.info(f"No SMA crossover signal for {self.symbol}")
+            return
+
+        qty = self.calc_position_size()
+        if qty <= 0:
+            log.warning(f"0 qty order unfilled for {self.symbol}")
             return
 
         # buy assets
@@ -165,11 +186,13 @@ class Buyer:
             return
 
         # wait until the order is filled
-        while order.status != "filled":
-            log.info(f"Buy order status: {order.status}")
+        count = 0
+        while order.status != "filled" and count < 5:
+            log.debug(f"Buy order status: {order.status}")
             sleep(0.1)
             order = self.api.get_order(order.id)
-        log.success("Buy order filled")
+            count += 1
+        log.success(f"Buy order for {self.symbol} filled")
 
         # create trailing stop loss order
         self.create_trailing_stop_loss_order(order)
