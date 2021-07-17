@@ -46,20 +46,20 @@ ensure_newline_before_comments = false
 [tool.pytest.ini_options]
 minversion = "6.0"
 log_cli = true
-addopts = '''
-(
-  -ra
-  -s
-  -m "not integration"
-  --strict-markers
-  --cov=trader
-  --cov-report=xml
-  --cov-report=html
-  --cov-report=term
-  --no-cov-on-fail
-  --maxfail=1
-)
-'''
+# addopts = '''
+# (
+#   -ra
+#   -s
+#   -m "not integration"
+#   --strict-markers
+#   --cov=trader
+#   --cov-report=xml
+#   --cov-report=html
+#   --cov-report=term
+#   --no-cov-on-fail
+#   --maxfail=1
+# )
+# '''
 testpaths = "tests"
 markers = [
   "integration",
