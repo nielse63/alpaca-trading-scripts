@@ -1,5 +1,3 @@
-import pathlib
-
 import pandas as pd
 from backtesting import Backtest
 from backtesting.lib import SignalStrategy, TrailingStrategy
@@ -8,13 +6,20 @@ from backtesting.test import SMA
 from trading_scripts.utils.constants import (
     ATR_MULTIPLIER,
     EQUITY_PCT_PER_TRADE,
+    HISTORICAL_DATA_INTERVAL,
+    HISTORICAL_DATA_PERIOD,
     TICKER_SYMBOL,
 )
 from trading_scripts.utils.helpers import get_historical_data
+from trading_scripts.utils.logger import logger as log
 
 
-def get_data():
-    df = get_historical_data(symbol=TICKER_SYMBOL, interval="1d", period="3y")
+def get_data(symbol):
+    df = get_historical_data(
+        symbol=symbol,
+        interval=HISTORICAL_DATA_INTERVAL,
+        period=HISTORICAL_DATA_PERIOD,
+    )
     df.drop(columns=["Dividends", "Stock Splits"], inplace=True)
     return df
 
@@ -56,48 +61,33 @@ class SmaCross(SignalStrategy, TrailingStrategy):
         self.set_trailing_sl(ATR_MULTIPLIER)
 
 
-if __name__ == "__main__":
-    bt = Backtest(get_data(), SmaCross, cash=10000, commission=0)
-    output: pd.Series = bt.run()
-    table = output.copy()
-    table.name = "Results"
-    for index, value in table.items():
-        if index.startswith("_"):
-            table.drop(labels=[index], inplace=True)
-            continue
-        new_value = str(value)
-        if "[%]" in index and isinstance(value, float):
-            new_value = "{0:.2f}%".format(value)
-        elif isinstance(value, float):
-            new_value = "{:n}".format(value)
-        elif isinstance(value, pd.Timedelta):
-            new_value = strfdelta(value, "{days} days")
-        elif isinstance(value, pd.Timestamp):
-            new_value = "{:%x}".format(value)
-        table[index] = new_value
+class Backtester:
+    def __init__(self, symbol: str = TICKER_SYMBOL, cash: int = 10_000):
+        self.symbol = symbol
+        self.cash = cash
 
-    # print to md file
-    results_table = table.to_markdown(
-        buf=None,
-        colalign=("left", "right"),
-        headers=[table.name],
-    )
-    trades_tables = pd.DataFrame(output._trades).to_markdown(buf=None, index=False)
-    markdown_string = f"""# Backtest Results
+    def get_results(self):
+        log.info(f"Backtesting {self.symbol}")
+        data = get_data(self.symbol)
+        try:
+            bt = Backtest(data, SmaCross, cash=self.cash, commission=0)
+            series: pd.Series = bt.run()
+            return_pct = series.get(key="Return [%]")
+            buy_and_hold_pct = series.get(key="Buy & Hold Return [%]")
+            max_drawdown_pct = series.get(key="Max. Drawdown [%]")
 
-## Results
+            return {
+                "symbol": self.symbol,
+                "return_pct": return_pct,
+                "buy_and_hold_pct": buy_and_hold_pct,
+                "max_drawdown_pct": max_drawdown_pct,
+            }
+        except Exception as error:
+            log.warning(f"Error backtesting {self.symbol}: {error}")
 
-{results_table}
-
-## Trades
-
-{trades_tables}
-    """
-
-    filepath = (
-        pathlib.Path(__file__).parent.parent.parent / "docs/results/backtest-results.md"
-    )
-    with open(filepath, "w+") as f:
-        f.write(markdown_string)
-
-    bt.plot(filename="docs/results/backtest-graph.html", open_browser=False)
+        return {
+            "symbol": self.symbol,
+            "return_pct": 0,
+            "buy_and_hold_pct": 0,
+            "max_drawdown_pct": 0,
+        }

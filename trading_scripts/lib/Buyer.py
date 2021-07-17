@@ -109,14 +109,15 @@ class Buyer:
         # create a new buy order
         try:
             qty = self.calc_position_size()
-            order = self.api.submit_order(
-                symbol=self.symbol,
-                side="buy",
-                type="market",
-                qty=qty,
-                time_in_force="day",
-            )
-            log.success(f"Buy order for {qty} shares of {self.symbol} submitted")
+            if qty:
+                order = self.api.submit_order(
+                    symbol=self.symbol,
+                    side="buy",
+                    type="market",
+                    qty=qty,
+                    time_in_force="day",
+                )
+                log.success(f"Buy order for {qty} shares of {self.symbol} submitted")
         except Exception as error:
             log.error(f"ERROR: {error}")
         return order

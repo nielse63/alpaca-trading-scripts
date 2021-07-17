@@ -63,7 +63,9 @@ def get_position_symbols() -> list[str]:
 def get_historical_data(symbol: str, interval: str = "1d", period: str = "1y"):
     logger.debug(f"getting data for {symbol}")
     session = get_requests_cache()
-    return yf.Ticker(symbol).history(interval=interval, period=period, session=session)
+    data = yf.Ticker(symbol, session=session)
+    history = data.history(interval=interval, period=period)
+    return history
 
 
 def SMA(data: pd.Series, n: int) -> pd.Series:

@@ -45,13 +45,20 @@ class Seller:
         stop_price = last_tick_price - atr * ATR_MULTIPLIER
         trail_points = last_tick_price - stop_price
         try:
-            sell_order = self.api.replace_order(
-                order_id=order.id,
-                stop_price=stop_price,
-                trail=trail_points,
-            )
-            log.success("Order updated")
-            print(sell_order)
+            # only replace order if new stop price is greater than the existing order
+            # stop price and the new trail value is different from the current trail
+            if float(stop_price) > float(order.stop_price) and float(
+                order.trail_price
+            ) != float(trail_points):
+                sell_order = self.api.replace_order(
+                    order_id=order.id,
+                    stop_price=stop_price,
+                    trail=trail_points,
+                )
+                log.success("Order updated")
+                print(sell_order)
+            else:
+                log.info(f"Not updating trailing stop order for {order.id}")
         except Exception as error:
             log.error(f"ERROR: {error}")
 
