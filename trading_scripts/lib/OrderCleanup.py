@@ -49,16 +49,16 @@ class OrderCleanup:
         return sell_orders
 
     def close_open_buy_orders(self):
-        log.info("Closing open buy orders")
         for order in self.get_buy_orders():
             if order.status != "filled":
+                log.info(f"Closing open buy order for {order.symbol}")
                 self.close_order(order.id)
 
     def close_orphaned_sell_orders(self):
-        log.info("Closing orphaned sell orders")
         position_symbols = self.position_symbols
         for order in self.get_sell_orders():
             if order.symbol not in position_symbols:
+                log.info(f"Closing orphaned sell order for {order.symbol}")
                 self.close_order(order.id)
 
     def run(self):

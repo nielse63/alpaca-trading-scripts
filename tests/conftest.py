@@ -35,7 +35,7 @@ def mock_account():
             "daytrade_count": 0,
             "daytrading_buying_power": "262113.632",
             "equity": "103820.56",
-            "id": "e6fe16f3-64a4-4921-8928-cadf02f92f98",
+            "id": "fake-account-id",
             "initial_margin": "63480.38",
             "last_equity": "103529.24",
             "last_maintenance_margin": "38000.832",
@@ -106,3 +106,12 @@ def mock_historical_data():
     json_filepath = pathlib.Path(__file__).parent / "test_data/aapl.json"
     data = pd.read_json(json_filepath)
     return data
+
+
+class MockClock(object):
+    is_open = True
+
+
+@pytest.fixture
+def mock_get_clock():
+    return MockClock()

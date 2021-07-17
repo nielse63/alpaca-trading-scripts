@@ -1,16 +1,18 @@
-from math import nan
+from unittest.mock import patch
 
 import pandas as pd
 import yfinance as yf
-from numpy import number
 
-from trading_scripts.utils.helpers import (  # SMA,
+from trading_scripts.utils.helpers import (
     close_open_buy_orders,
+    get_account,
     get_historical_data,
     get_last_quote,
     get_position_symbols,
     get_positions,
     get_trailing_stop_orders,
+    is_market_open,
+    validate_env_vars,
 )
 
 
@@ -143,3 +145,40 @@ def test_get_historical_data(mocker, mock_historical_data):
     columns = ["Open", "High", "Low", "Close", "Volume", "Dividends", "Stock Splits"]
     for column in columns:
         assert response[column] is not None
+
+
+def test_get_account(mocker, mock_account):
+    mocker.patch(
+        "trading_scripts.utils.helpers.Cache.API_CLIENT.get_account",
+        return_value=mock_account,
+    )
+    account = get_account()
+    assert account.id == "fake-account-id"
+    assert account.cash == "10000.00"
+
+
+@patch("os.getenv")
+@patch("sys.exit")
+def test_validate_env_vars(mock_exit, mock_getenv):
+    validate_env_vars()
+    assert mock_getenv.call_count == 2
+    mock_exit.assert_not_called()
+
+
+def test_validate_env_vars_exit(mocker):
+    mocked_logger_error = mocker.patch("loguru.logger.error")
+    mock_exit = mocker.patch("sys.exit")
+    mocker.patch("os.getenv", return_value=False)
+
+    validate_env_vars()
+    mock_exit.assert_called_with(1)
+    mocked_logger_error.assert_called()
+
+
+def test_is_market_open(mocker, mock_get_clock):
+    mocker.patch(
+        "trading_scripts.utils.helpers.Cache.API_CLIENT.get_clock",
+        return_value=mock_get_clock,
+    )
+    is_open = is_market_open()
+    assert is_open

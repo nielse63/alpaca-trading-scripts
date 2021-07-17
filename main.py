@@ -28,13 +28,11 @@ def main():
     tickers = []
     if market_open:
         tickers = screener()
-    print(f"tickers length: {len(tickers)}")
 
     # buy only when market is opoen
     available_cash = Buyer().available_cash
     for dictionary in tickers:
         symbol = dictionary["symbol"]
-        print(f"available_cash: {available_cash}")
         buyer = Buyer(symbol=symbol, cash=available_cash)
         qty = buyer.calc_position_size()
         if qty < 1:

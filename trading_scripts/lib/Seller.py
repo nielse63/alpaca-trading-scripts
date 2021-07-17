@@ -48,7 +48,7 @@ class Seller:
     def update_trailing_stop_loss_order(self, order: alpaca.Order) -> alpaca.Order:
         data = StockDataFrame.retype(
             get_historical_data(
-                order.symbol,
+                symbol=order.symbol,
                 interval=HISTORICAL_DATA_INTERVAL,
                 period=HISTORICAL_DATA_PERIOD,
             )
@@ -77,12 +77,13 @@ class Seller:
             log.error(f"ERROR: {error}")
 
     def run(self):
-        log.info("Starting Seller.run")
 
         # only run when market is open
         if not is_market_open():
-            print("Market is not open - stopping execution")
+            # print("Market is not open - stopping execution")
             return
+
+        log.info("Starting Seller.run")
 
         # create sell orders for positions without trailing sttop loss orders
         order_symbols = self.get_order_symbols()

@@ -39,7 +39,7 @@ class Buyer:
     def __get_data(self):
         return StockDataFrame.retype(
             get_historical_data(
-                self.symbol,
+                symbol=self.symbol,
                 interval=HISTORICAL_DATA_INTERVAL,
                 period=HISTORICAL_DATA_PERIOD,
             )
@@ -114,7 +114,7 @@ class Buyer:
         # create a new buy order
         try:
             qty = self.calc_position_size()
-            if qty:
+            if qty > 0:
                 order = self.api.submit_order(
                     symbol=self.symbol,
                     side="buy",
@@ -128,14 +128,11 @@ class Buyer:
         return order
 
     def create_trailing_stop_loss_order(self, buy_order: alpaca.Order):
-        # if buy_order.status != "filled":
-        #     return
-
         # create trailing stop loss order
-        if isinstance(buy_order, alpaca.Order):
-            price = buy_order.filled_avg_price
-        else:
+        if isinstance(buy_order, alpaca.Position):
             price = buy_order.current_price
+        else:
+            price = buy_order.filled_avg_price
         try:
             trail_price = self.get_trailing_stop_loss_points(float(price))
             sell_order = self.submit_order(
@@ -164,13 +161,13 @@ class Buyer:
                     log.warning(f"Failure to cancel open buy order: {order.id}")
 
     def run(self):
-        log.debug("Starting Buyer.run")
 
         # only run if market is open
         if not self.is_market_open:
-            print("Market is not open - preventing execution")
+            # print("Market is not open - preventing execution")
             return
 
+        log.info("Starting Buyer.run")
         if self.symbol_is_in_portfolio:
             # log.info(f"Preventing purchase of {self.symbol} - already in portfolio")
             return
