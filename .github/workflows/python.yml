@@ -29,8 +29,9 @@ jobs:
         with:
           python-version: "3.9" # Version range or exact version of a Python version to use, using SemVer's version range syntax
           architecture: "x64" # optional x64 or x86. Defaults to x64 if not specified
-      - run: .bin/setup-prod
+      - run: .bin/setup
       - run: .bin/validate
+      - run: py.test
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
           APCA_API_KEY_ID: ${{ secrets.APCA_API_KEY_ID }}

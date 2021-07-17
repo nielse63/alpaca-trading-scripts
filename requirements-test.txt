@@ -1,0 +1,7 @@
+# test requirements
+requests-mock==1.9.3
+pytest==6.2.4
+pytest-assert-utils==0.2.2
+pytest-cov==2.12.1
+pytest-mock==3.6.1
+Faker==8.10.1
