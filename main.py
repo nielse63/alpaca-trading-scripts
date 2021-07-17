@@ -19,12 +19,10 @@ def main():
 
     market_open = is_market_open()
     if not market_open:
-        log.warn("Market not open. No buying or selling activity will execute")
+        log.warning("Market not open. No buying or selling activity will execute")
 
-    oc = OrderCleanup()
-
-    # cancel open buy orders
-    oc.close_open_buy_orders()
+    # cleanup unfilled buy orders and orphaned sell orders
+    OrderCleanup().close_open_buy_orders()
 
     # screen for potential assets to buy
     tickers = []
@@ -39,10 +37,6 @@ def main():
 
     # sell orders can be only during market hours
     Seller().run()
-
-    # cleanup all orders when not trading
-    if not market_open:
-        oc.run()
 
 
 if __name__ == "__main__":
