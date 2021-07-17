@@ -1,5 +1,3 @@
-import json
-
 from alpaca_trade_api.rest import Order
 from faker import Faker
 
@@ -37,7 +35,7 @@ def generate_buy_order():
     }
 
 
-def generate_order(symbol: str = "AAPL", side=None):
+def generate_order(symbol: str, side=None):
     id = get_uuid()
     client_order_id = get_uuid()
     asset_id = get_uuid()
@@ -82,14 +80,5 @@ def generate_order(symbol: str = "AAPL", side=None):
     return base_order
 
 
-def get_test_order_list_json():
-    output = []
-    count = 0
-    while count < 3:
-        output.append(generate_order())
-        count += 1
-    return json.dumps(output)
-
-
-def mock_order(symbol: str = "AAPL", side=None):
+def mock_order(symbol: str, side=None):
     return Order(generate_order(symbol=symbol, side=side))

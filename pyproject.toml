@@ -46,7 +46,7 @@ ensure_newline_before_comments = false
 [tool.pytest.ini_options]
 minversion = "6.2.4"
 log_cli = true
-addopts = "-ra -s --cov=trading_scripts --cov-report=xml --cov-report=html --cov-report=term --no-cov-on-fail"
+addopts = "-ra -s --cov=trading_scripts --cov-report=term --no-cov-on-fail"
 testpaths = "tests"
 markers = [
   "integration",

@@ -1,6 +1,7 @@
 import alpaca_trade_api.rest as alpaca
 from stockstats import StockDataFrame
 
+from trading_scripts.lib.Buyer import Buyer
 from trading_scripts.utils.constants import (
     ATR_MULTIPLIER,
     HISTORICAL_DATA_INTERVAL,
@@ -29,10 +30,25 @@ class Seller:
                 output.append(order)
         return output
 
+    def get_order_symbols(self) -> list[str]:
+        output = []
+        for order in self.get_orders():
+            output.append(order.symbol)
+        return output
+
+    def get_positions(self) -> list[alpaca.Position]:
+        return self.api.list_positions()
+
+    def get_position_symbols(self) -> list[str]:
+        output = []
+        for position in self.get_positions():
+            output.append(position.symbol)
+        return output
+
     def update_trailing_stop_loss_order(self, order: alpaca.Order) -> alpaca.Order:
         data = StockDataFrame.retype(
             get_historical_data(
-                order.symbol,
+                symbol=order.symbol,
                 interval=HISTORICAL_DATA_INTERVAL,
                 period=HISTORICAL_DATA_PERIOD,
             )
@@ -55,19 +71,26 @@ class Seller:
                 )
                 log.success("Order updated")
                 print(sell_order)
-            else:
-                log.info(
-                    f"Not updating trailing stop order for {order.symbol} (id: {order.id})"
-                )
+            # else:
+            #     log.debug(f"Not updating trailing stop order for {order.symbol}")
         except Exception as error:
             log.error(f"ERROR: {error}")
 
     def run(self):
-        log.info("Starting Seller.run")
 
         # only run when market is open
         if not is_market_open():
-            print("Market is not open - stopping execution")
+            # print("Market is not open - stopping execution")
             return
+
+        log.info("Starting Seller.run")
+
+        # create sell orders for positions without trailing sttop loss orders
+        order_symbols = self.get_order_symbols()
+        for position in self.get_positions():
+            if position.symbol not in order_symbols:
+                Buyer(position.symbol).create_trailing_stop_loss_order(position)
+
+        # update existing open sell orders
         for order in self.get_orders():
             self.update_trailing_stop_loss_order(order)

@@ -1,6 +1,9 @@
+import pathlib
+
+import pandas as pd
 import pytest
 from alpaca_trade_api.entity import Account as AlpacaAccount
-from alpaca_trade_api.entity import Order, Position
+from alpaca_trade_api.entity import Bar, Order, Position
 from dotenv import load_dotenv
 
 from .test_data.order import mock_order
@@ -32,7 +35,7 @@ def mock_account():
             "daytrade_count": 0,
             "daytrading_buying_power": "262113.632",
             "equity": "103820.56",
-            "id": "e6fe16f3-64a4-4921-8928-cadf02f92f98",
+            "id": "fake-account-id",
             "initial_margin": "63480.38",
             "last_equity": "103529.24",
             "last_maintenance_margin": "38000.832",
@@ -68,3 +71,47 @@ def mock_positions() -> list[Position]:
     for _ in range(1):
         output.append(mock_position())
     return output
+
+
+@pytest.fixture
+def mock_barset() -> dict:
+    return {
+        "AAPL": [
+            Bar(
+                {
+                    "c": "146.38",
+                    "h": "146.415",
+                    "l": "146.305",
+                    "o": "146.365",
+                    "t": "1626465540",
+                    "v": "11470",
+                }
+            ),
+            Bar(
+                {
+                    "c": "146.16",
+                    "h": "146.16",
+                    "l": "146.16",
+                    "o": "146.16",
+                    "t": "1626468780",
+                    "v": "150",
+                }
+            ),
+        ]
+    }
+
+
+@pytest.fixture
+def mock_historical_data():
+    json_filepath = pathlib.Path(__file__).parent / "test_data/aapl.json"
+    data = pd.read_json(json_filepath)
+    return data
+
+
+class MockClock(object):
+    is_open = True
+
+
+@pytest.fixture
+def mock_get_clock():
+    return MockClock()

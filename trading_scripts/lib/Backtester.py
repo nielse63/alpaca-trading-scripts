@@ -67,7 +67,7 @@ class Backtester:
         self.cash = cash
 
     def get_results(self):
-        log.info(f"Backtesting {self.symbol}")
+        # log.info(f"Backtesting {self.symbol}")
         data = get_data(self.symbol)
         try:
             bt = Backtest(data, SmaCross, cash=self.cash, commission=0)
@@ -75,19 +75,26 @@ class Backtester:
             return_pct = series.get(key="Return [%]")
             buy_and_hold_pct = series.get(key="Buy & Hold Return [%]")
             max_drawdown_pct = series.get(key="Max. Drawdown [%]")
+            expectancy = series.get(key="Expectancy [%]")
+            return_offset = return_pct + max_drawdown_pct + expectancy
 
             return {
                 "symbol": self.symbol,
                 "return_pct": return_pct,
                 "buy_and_hold_pct": buy_and_hold_pct,
                 "max_drawdown_pct": max_drawdown_pct,
+                "return_offset": return_offset,
+                "expectancy": expectancy,
             }
         except Exception as error:
             log.warning(f"Error backtesting {self.symbol}: {error}")
+            print(error)
 
         return {
             "symbol": self.symbol,
             "return_pct": 0,
             "buy_and_hold_pct": 0,
             "max_drawdown_pct": 0,
+            "return_offset  ": 0,
+            "expectancy": 0,
         }

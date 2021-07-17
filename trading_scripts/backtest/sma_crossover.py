@@ -8,13 +8,19 @@ from backtesting.test import SMA
 from trading_scripts.utils.constants import (
     ATR_MULTIPLIER,
     EQUITY_PCT_PER_TRADE,
+    HISTORICAL_DATA_INTERVAL,
+    HISTORICAL_DATA_PERIOD,
     TICKER_SYMBOL,
 )
 from trading_scripts.utils.helpers import get_historical_data
 
 
 def get_data():
-    df = get_historical_data(symbol=TICKER_SYMBOL, interval="1d", period="3y")
+    df = get_historical_data(
+        symbol=TICKER_SYMBOL,
+        interval=HISTORICAL_DATA_INTERVAL,
+        period=HISTORICAL_DATA_PERIOD,
+    )
     df.drop(columns=["Dividends", "Stock Splits"], inplace=True)
     return df
 

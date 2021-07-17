@@ -12,7 +12,8 @@
     "**/.cache": true,
     "htmlcov": true,
     "**/dist": true,
-    "**/.eggs": true
+    "**/.eggs": true,
+    "tests/test_data/*.{json,csv}": true
   },
   "search.exclude": {
     "**/data/**": true

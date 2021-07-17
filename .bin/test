@@ -2,4 +2,9 @@
 set -e
 
 . activate
-py.test
+export IS_TEST=true
+if [ "$CI" ]; then
+  py.test --cov-report=xml --cov-branch
+else
+  py.test --cov-report=html
+fi

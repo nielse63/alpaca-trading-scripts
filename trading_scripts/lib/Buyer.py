@@ -12,9 +12,9 @@ from trading_scripts.utils.constants import (
     MAX_DRAWDOWN_PCT,
 )
 from trading_scripts.utils.helpers import (
-    close_open_buy_orders,
     create_client,
     get_historical_data,
+    get_last_quote,
     get_positions,
     is_market_open,
 )
@@ -27,17 +27,19 @@ class Buyer:
     data: pd.DataFrame = None
     api: alpaca = None
 
-    def __init__(self, symbol: str) -> None:
+    def __init__(self, symbol: str = "", cash: float = None) -> None:
         self.symbol = symbol
         self.api = create_client()
         self.positions = get_positions()
-        if not self.symbol_is_in_portfolio:
+        self.is_market_open: bool = is_market_open()
+        if self.symbol:
             self.data = self.__get_data()
+        self._cash = cash
 
     def __get_data(self):
         return StockDataFrame.retype(
             get_historical_data(
-                self.symbol,
+                symbol=self.symbol,
                 interval=HISTORICAL_DATA_INTERVAL,
                 period=HISTORICAL_DATA_PERIOD,
             )
@@ -80,12 +82,14 @@ class Buyer:
 
     @property
     def available_cash(self):
+        if self._cash and not self.is_market_open:
+            return self._cash
         account = self.api.get_account()
         return round(float(account.cash), 2)
 
     @property
     def last_price(self):
-        return round(float(self.data.close.iloc[-1]), 2)
+        return get_last_quote(self.symbol)
 
     def get_trailing_stop_loss_points(
         self, price: float, get_drawdown_points: float = 5.0
@@ -105,12 +109,12 @@ class Buyer:
         return math.floor(position_qty)
 
     def create_buy_order(self) -> alpaca.Order:
-        log.debug("Buyer#create_buy_order")
+        # log.debug("Buyer#create_buy_order")
 
         # create a new buy order
         try:
             qty = self.calc_position_size()
-            if qty:
+            if qty > 0:
                 order = self.api.submit_order(
                     symbol=self.symbol,
                     side="buy",
@@ -124,14 +128,13 @@ class Buyer:
         return order
 
     def create_trailing_stop_loss_order(self, buy_order: alpaca.Order):
-        if buy_order.status != "filled":
-            return
-
         # create trailing stop loss order
+        if isinstance(buy_order, alpaca.Position):
+            price = buy_order.current_price
+        else:
+            price = buy_order.filled_avg_price
         try:
-            trail_price = self.get_trailing_stop_loss_points(
-                float(buy_order.filled_avg_price)
-            )
+            trail_price = self.get_trailing_stop_loss_points(float(price))
             sell_order = self.submit_order(
                 side="sell",
                 type="trailing_stop",
@@ -158,25 +161,24 @@ class Buyer:
                     log.warning(f"Failure to cancel open buy order: {order.id}")
 
     def run(self):
-        log.info("Starting Buyer.run")
-        close_open_buy_orders(self.api)
 
         # only run if market is open
-        if not is_market_open():
-            print("Market is not open - preventing execution")
+        if not self.is_market_open:
+            # print("Market is not open - preventing execution")
             return
 
+        log.info("Starting Buyer.run")
         if self.symbol_is_in_portfolio:
-            log.info(f"Preventing purchase of {self.symbol} - already in portfolio")
+            # log.info(f"Preventing purchase of {self.symbol} - already in portfolio")
             return
 
         if not self.sma_crossover_signal():
-            log.info(f"No SMA crossover signal for {self.symbol}")
+            # log.info(f"No SMA crossover signal for {self.symbol}")
             return
 
         qty = self.calc_position_size()
         if qty <= 0:
-            log.warning(f"0 qty order unfilled for {self.symbol}")
+            # log.warning(f"0 qty order unfilled for {self.symbol}")
             return
 
         # buy assets
@@ -189,12 +191,13 @@ class Buyer:
 
         # wait until the order is filled
         count = 0
-        while order.status != "filled" and count < 5:
-            log.debug(f"Buy order status: {order.status}")
+        while order.status != "filled" and count < 15:
+            # log.debug(f"Buy order status: {order.status}")
             sleep(0.1)
             order = self.api.get_order(order.id)
             count += 1
-        log.success(f"Buy order for {self.symbol} filled")
 
-        # create trailing stop loss order
-        self.create_trailing_stop_loss_order(order)
+        # create trailing stop loss order once the order is filled
+        if order.status == "filled":
+            log.success(f"Buy order for {self.symbol} filled")
+            self.create_trailing_stop_loss_order(order)
