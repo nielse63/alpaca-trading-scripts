@@ -199,8 +199,8 @@ class Buyer:
             sleep(0.1)
             order = self.api.get_order(order.id)
             count += 1
+
+        # create trailing stop loss order once the order is filled
         if order.status == "filled":
             log.success(f"Buy order for {self.symbol} filled")
-
-            # create trailing stop loss order
             self.create_trailing_stop_loss_order(order)
