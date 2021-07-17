@@ -49,6 +49,18 @@ def get_requests_cache() -> CachedSession:
     )
 
 
+def close_open_buy_orders(client=api):
+    log.info("Closing open buy orders, if any")
+    orders = client.list_orders(params={"side": "buy"})
+    for order in orders:
+        if order.status != "filled":
+            try:
+                client.cancel_order(order.id)
+                log.info(f"Cancelled open buy order for {order.symbol}")
+            except:
+                log.warning(f"Failure to cancel open buy order: {order.id}")
+
+
 def get_positions() -> list[Position]:
     return api.list_positions()
 

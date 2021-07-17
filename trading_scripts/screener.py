@@ -4,7 +4,7 @@ from trading_scripts.lib.Backtester import Backtester
 from trading_scripts.utils.logger import logger as log
 
 
-def main():
+def main(max_count: int = 3) -> list[dict]:
     filters = [
         "geo_usa",
         "sh_avgvol_o500",
@@ -37,8 +37,7 @@ def main():
 
     # sort output by return %
     output.sort(key=sort_fn, reverse=True)
-    # print(f"Length: {len(output)}")
-    return output[0:3]
+    return output[0:max_count]
 
 
 if __name__ == "__main__":
