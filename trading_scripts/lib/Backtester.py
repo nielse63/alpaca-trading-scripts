@@ -84,6 +84,7 @@ class Backtester:
             }
         except Exception as error:
             log.warning(f"Error backtesting {self.symbol}: {error}")
+            print(error)
 
         return {
             "symbol": self.symbol,

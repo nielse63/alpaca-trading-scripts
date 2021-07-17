@@ -2,8 +2,6 @@ from unittest.mock import patch
 
 from trading_scripts.lib.OrderCleanup import OrderCleanup
 
-# from trading_scripts.utils.logger import logger
-
 
 def test_order_cleanup(mocker, mock_orders, mock_positions):
     orders_list = mock_orders.copy()

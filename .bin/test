@@ -2,4 +2,5 @@
 set -e
 
 . activate
+export IS_TEST=true
 py.test

@@ -27,13 +27,30 @@ def main():
     # screen for potential assets to buy
     tickers = []
     if market_open:
-        tickers = screener(max_count=3)
+        tickers = screener()
+    print(f"tickers length: {len(tickers)}")
 
     # buy only when market is opoen
+    available_cash = Buyer().available_cash
     for dictionary in tickers:
         symbol = dictionary["symbol"]
-        buyer = Buyer(symbol)
+        print(f"available_cash: {available_cash}")
+        buyer = Buyer(symbol=symbol, cash=available_cash)
+        qty = buyer.calc_position_size()
+        if qty < 1:
+            continue
+        order_cost = qty * buyer.last_price
+        remaining_cash = available_cash - order_cost
+        if remaining_cash <= 0:
+            log.warning(
+                f"cant afford to buy {symbol} (qty: {qty}, last_price: {buyer.last_price}, order_cost: {order_cost})"
+            )
+            continue
+        # print(
+        #     f"symbol: {symbol}, qty: {qty}, last_price: {buyer.last_price}, order_cost: {order_cost}"
+        # )
         buyer.run()
+        available_cash = remaining_cash
 
     # sell orders can be only during market hours
     Seller().run()

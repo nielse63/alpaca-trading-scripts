@@ -3,8 +3,8 @@ import sys
 from datetime import timedelta
 
 import alpaca_trade_api as alpaca
-import pandas as pd
 import yfinance as yf
+from alpaca_trade_api.entity import Order
 from alpaca_trade_api.rest import Position
 from dotenv import load_dotenv
 from requests_cache import CachedSession
@@ -50,7 +50,7 @@ def get_requests_cache() -> CachedSession:
 
 
 def close_open_buy_orders(client=api):
-    log.info("Closing open buy orders, if any")
+    # log.debug("Closing open buy orders, if any")
     orders = client.list_orders(params={"side": "buy"})
     for order in orders:
         if order.status != "filled":
@@ -58,7 +58,7 @@ def close_open_buy_orders(client=api):
                 client.cancel_order(order.id)
                 log.info(f"Cancelled open buy order for {order.symbol}")
             except:
-                log.warning(f"Failure to cancel open buy order: {order.id}")
+                log.error(f"Failure to cancel open buy order: {order.id}")
 
 
 def get_positions() -> list[Position]:
@@ -73,23 +73,19 @@ def get_position_symbols() -> list[str]:
 
 
 def get_historical_data(symbol: str, interval: str = "1d", period: str = "1y"):
-    # log.debug(f"getting data for {symbol}")
     session = get_requests_cache()
     data = yf.Ticker(symbol, session=session)
     history = data.history(interval=interval, period=period)
     return history
 
 
-def SMA(data: pd.Series, n: int) -> pd.Series:
-    return pd.Series(data).rolling(n).mean()
-
-
-def get_trailing_stop_orders(symbol: str) -> list:
+def get_trailing_stop_orders(symbol: str) -> list[Order]:
     orders = api.list_orders(status="open", symbols=[symbol])
-    output = filter(
-        lambda order: order.side == "sell" and order.type == "trailing_stop", orders
-    )
-    return list(output)
+    output = []
+    for order in orders:
+        if order.side == "sell" and order.type == "trailing_stop":
+            output.append(order)
+    return output
 
 
 def get_last_quote(symbol: str) -> float:
