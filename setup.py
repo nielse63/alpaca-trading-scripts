@@ -18,7 +18,7 @@ def read_requirements(filename):
 
 
 settings = dict(
-    # name="alpaca_trading_scripts",
+    name="alpaca_trading_scripts",
     packages=["trading_scripts"],
     # version=__version__,
     # author="Erik Nielsen",

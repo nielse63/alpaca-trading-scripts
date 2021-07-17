@@ -5,14 +5,14 @@ from trading_scripts.lib.Buyer import Buyer
 from trading_scripts.lib.Seller import Seller
 from trading_scripts.screener import main as screener
 from trading_scripts.utils.helpers import is_market_open, validate_env_vars
-from trading_scripts.utils.logger import logger
+from trading_scripts.utils.logger import logger as log
 
 load_dotenv()
 
 
 def main():
     if not is_market_open():
-        logger.warning("Market is not open - stopping execution")
+        log.warning("Market is not open - stopping execution")
         return
 
     validate_env_vars()
