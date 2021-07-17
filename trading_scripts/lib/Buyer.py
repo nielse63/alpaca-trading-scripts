@@ -12,6 +12,7 @@ from trading_scripts.utils.constants import (
     MAX_DRAWDOWN_PCT,
 )
 from trading_scripts.utils.helpers import (
+    close_open_buy_orders,
     create_client,
     get_historical_data,
     get_positions,
@@ -137,6 +138,7 @@ class Buyer:
                 time_in_force="gtc",
                 trail_price=trail_price,
                 qty=buy_order.qty,
+                extended_hours=True,
             )
             log.success("Trailing Stop order created")
             log.info(
@@ -145,19 +147,9 @@ class Buyer:
         except Exception as error:
             log.error(f"ERROR: {error}")
 
-    def clear_buy_orders(self):
-        orders = self.api.list_orders()
-        for order in orders:
-            if order.side == "buy" and order.status != "filled":
-                try:
-                    self.api.cancel_order(order.id)
-                    log.info(f"Cancelled open buy order for {order.symbol}")
-                except:
-                    log.warning(f"Failure to cancel open buy order: {order.id}")
-
     def run(self):
         log.info("Starting Buyer.run")
-        self.clear_buy_orders()
+        close_open_buy_orders(self.api)
 
         # only run if market is open
         if not is_market_open():
