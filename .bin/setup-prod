@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 set -e
 
+echo "Cleaning old files"
+.bin/clean
+
+echo "Setting up environment"
 python3.9 -m venv venv
 if [ ! -f "activate" ]; then
   ln -s venv/bin/activate activate
-fi
-if [ -f "trading_scripts/__init__.py" ]; then
-  rm trading_scripts/__init__.py
 fi
 . activate
 python -m pip install --upgrade pip

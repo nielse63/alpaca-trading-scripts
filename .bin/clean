@@ -7,7 +7,8 @@ $(command -v deactivate) && deactivate
 # cleanup
 rm -rf \
   venv/ \
-  ./*.egg-info \
+  .eggs \
+  *.egg-info \
   .mypy_cache \
   .pytest_cache \
   .cache/ \
@@ -16,7 +17,8 @@ rm -rf \
   activate \
   .coverage \
   .coverage.xml \
-  htmlcov
+  htmlcov \
+  trading_scripts/__init__.py
 
 # remove all __pycache__ folders
 find trading_scripts -name __pycache__ -type d -print0 | xargs -0 /bin/rm -rf

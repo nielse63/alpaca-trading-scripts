@@ -26,7 +26,7 @@ trailing_stop = "trading_scripts:trailing_stop"
 
 [build-system]
 requires = [
-    "setuptools >= 57.0.0",
+    "setuptools >= 57.2.0",
     "setuptools_scm >= 6.0.1",
     "wheel"
 ]

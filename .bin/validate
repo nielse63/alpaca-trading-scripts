@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 set -e
 
-. activate
 venv/bin/isort trading_scripts ./*.py
 venv/bin/black trading_scripts ./*.py
 venv/bin/flake8 trading_scripts ./*.py
