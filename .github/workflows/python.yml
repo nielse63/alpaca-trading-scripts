@@ -33,7 +33,11 @@ jobs:
       - run: .bin/validate
       - run: .bin/test
         env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
           APCA_API_KEY_ID: ${{ secrets.APCA_API_KEY_ID }}
           APCA_API_SECRET_KEY: ${{ secrets.APCA_API_SECRET_KEY }}
           APCA_API_BASE_URL: ${{ secrets.APCA_API_BASE_URL }}
+      - name: "Upload coverage to Codecov"
+        uses: codecov/codecov-action@v1
+        with:
+          fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}
