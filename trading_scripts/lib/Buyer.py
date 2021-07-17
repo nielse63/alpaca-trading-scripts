@@ -147,6 +147,16 @@ class Buyer:
         except Exception as error:
             log.error(f"ERROR: {error}")
 
+    def clear_buy_orders(self):
+        orders = self.api.list_orders()
+        for order in orders:
+            if order.side == "buy" and order.status != "filled":
+                try:
+                    self.api.cancel_order(order.id)
+                    log.info(f"Cancelled open buy order for {order.symbol}")
+                except:
+                    log.warning(f"Failure to cancel open buy order: {order.id}")
+
     def run(self):
         log.info("Starting Buyer.run")
         close_open_buy_orders(self.api)

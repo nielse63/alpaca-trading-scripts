@@ -11,7 +11,8 @@
     "**/*.*_cache": true,
     "**/.cache": true,
     "htmlcov": true,
-    "**/dist": true
+    "**/dist": true,
+    "**/.eggs": true
   },
   "search.exclude": {
     "**/data/**": true
@@ -38,6 +39,7 @@
     "**/.cache/**": true,
     "**/data/**": true,
     "**/logs/**": true,
-    "**/venv/**": true
+    "**/venv/**": true,
+    "**/.eggs/**": true
   }
 }
