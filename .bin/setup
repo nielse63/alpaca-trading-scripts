@@ -16,8 +16,10 @@ pip install -r requirements-test.txt
 python setup.py develop
 
 # install git hooks
-if [ -d  ".git" ]; then
-  for f in .bin/hooks/*; do
-    cp -v $f ".git/hooks/$(basename $f)"
-  done
+if [ ! "$CI" ]; then
+  if [ -d  ".git" ]; then
+    for f in .bin/hooks/*; do
+      cp -v $f ".git/hooks/$(basename $f)"
+    done
+  fi
 fi
