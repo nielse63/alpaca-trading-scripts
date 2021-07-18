@@ -2,7 +2,7 @@
 
 ## v1.0.0
 
-- [4ea4d7e](https://github.com/nielse63/alpaca-trading-scripts/commit/4ea4d7e) - feat: created release script [(#18)](https://github.com/nielse63/alpaca-trading-scripts/pull/18)
+- [e6d1186](https://github.com/nielse63/alpaca-trading-scripts/commit/e6d1186) - feat: created release script [(#18)](https://github.com/nielse63/alpaca-trading-scripts/pull/18)
 - [1c71330](https://github.com/nielse63/alpaca-trading-scripts/commit/1c71330) - Tests: New tests [(#17)](https://github.com/nielse63/alpaca-trading-scripts/pull/17)
   - tests: created new tests
     - chore: updated test config
