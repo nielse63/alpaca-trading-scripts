@@ -15,9 +15,19 @@ def main():
     output = rvalue.stdout.decode("utf-8").strip()
     lines = re.split(r"\n", output)
     python_files = []
+    markdown_files = []
     for line in lines:
         if re.search(r"\.py$", line) and pathlib.Path(line).exists():
             python_files.append(line)
+        elif re.search(r"\.md$", line) and pathlib.Path(line).exists():
+            markdown_files.append(line)
+
+    for file in markdown_files:
+        subprocess.run(
+            ["npx", "markdownlint", "--fix", file],
+            stdout=subprocess.PIPE,
+        )
+        subprocess.run(["/usr/local/bin/git", "add", file])
 
     if not len(python_files):
         print("No python files to lint - exiting")

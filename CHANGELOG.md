@@ -1,0 +1,54 @@
+# Changelog
+
+## v1.0.0
+
+- [4ea4d7e](https://github.com/nielse63/alpaca-trading-scripts/commit/4ea4d7e) - feat: created release script [(#18)](https://github.com/nielse63/alpaca-trading-scripts/pull/18)
+- [1c71330](https://github.com/nielse63/alpaca-trading-scripts/commit/1c71330) - Tests: New tests [(#17)](https://github.com/nielse63/alpaca-trading-scripts/pull/17)
+  - tests: created new tests
+    - chore: updated test config
+    - feat: improved script execution and testing
+    - chore: fixing failing test
+- [b5e4259](https://github.com/nielse63/alpaca-trading-scripts/commit/b5e4259) - Create initial tests [(#16)](https://github.com/nielse63/alpaca-trading-scripts/pull/16)
+  - feat: updated main execution script
+    - dev: updated github action and lint scripts
+    - test: updated tests
+    - test: created first test for OrderCleanup
+    - test: created test runner script
+    - chore: updated github action to upload code coverage
+- [770ddef](https://github.com/nielse63/alpaca-trading-scripts/commit/770ddef) - bug: fixing logger method error
+- [b41394c](https://github.com/nielse63/alpaca-trading-scripts/commit/b41394c) - Create order cleanup script [(#15)](https://github.com/nielse63/alpaca-trading-scripts/pull/15)
+  - feat: updated main execution script
+    - dev: updated github action and lint scripts
+    - feat: created order cleanup executions
+- [90e3382](https://github.com/nielse63/alpaca-trading-scripts/commit/90e3382) - feat: updated main execution script [(#14)](https://github.com/nielse63/alpaca-trading-scripts/pull/14)
+  - feat: updated main execution script
+    - chore: updated linter configs
+    - dev: updated github action and lint scripts
+    - chore: updated codeql execution schedule
+- [b25e35e](https://github.com/nielse63/alpaca-trading-scripts/commit/b25e35e) - feat: added screener
+- [ab29e9d](https://github.com/nielse63/alpaca-trading-scripts/commit/ab29e9d) - chore: created setup-prod script
+- [54befe3](https://github.com/nielse63/alpaca-trading-scripts/commit/54befe3) - Created script runner [(#7)](https://github.com/nielse63/alpaca-trading-scripts/pull/7)
+  - finished seller class
+    - removed unused code
+- [b7000dd](https://github.com/nielse63/alpaca-trading-scripts/commit/b7000dd) - created broker class [(#6)](https://github.com/nielse63/alpaca-trading-scripts/pull/6)
+  - created broker class
+    - updated time in force for sell order
+- [cca6302](https://github.com/nielse63/alpaca-trading-scripts/commit/cca6302) - Finalized backtest framework setup [(#5)](https://github.com/nielse63/alpaca-trading-scripts/pull/5)
+  - chore: cleaned up the code a bit
+    - improved production script
+    - fixing codeql config
+    - updated config and build files
+    - cleaned up source
+    - completed sma crossover backtest successfully
+    - removing unneeded requirements
+- [a455597](https://github.com/nielse63/alpaca-trading-scripts/commit/a455597) - Feature: Script improvements [(#4)](https://github.com/nielse63/alpaca-trading-scripts/pull/4)
+  - chore: cleaned up the code a bit
+    - improved production script
+    - fixing codeql config
+- [ec059a8](https://github.com/nielse63/alpaca-trading-scripts/commit/ec059a8) - moved codeql
+- [c7d1cde](https://github.com/nielse63/alpaca-trading-scripts/commit/c7d1cde) - Initial Setup [(#2)](https://github.com/nielse63/alpaca-trading-scripts/pull/2)
+  - created basic buy script
+    - created trailing stop loss script
+    - added gh actions
+- [fee3979](https://github.com/nielse63/alpaca-trading-scripts/commit/fee3979) - Created codeql action [(#1)](https://github.com/nielse63/alpaca-trading-scripts/pull/1)
+- [a1de225](https://github.com/nielse63/alpaca-trading-scripts/commit/a1de225) - Initial commit
