@@ -5,7 +5,7 @@ from trading_scripts.lib.Buyer import Buyer
 from trading_scripts.lib.OrderCleanup import OrderCleanup
 from trading_scripts.lib.Seller import Seller
 from trading_scripts.screener import main as screener
-from trading_scripts.utils.helpers import is_market_open, validate_env_vars
+from trading_scripts.utils.helpers import get_account, is_market_open, validate_env_vars
 from trading_scripts.utils.logger import logger as log
 
 load_dotenv()
@@ -31,7 +31,14 @@ def main():
 
     # buy only when market is opoen
     available_cash = Buyer().available_cash
+    account = get_account()
+    last_equity = float(account.last_equity)
     for dictionary in tickers:
+        if available_cash < last_equity * 0.2:
+            log.info(
+                f"Reached cash-to-equity threshold (cash: {available_cash}, equity: {last_equity})"
+            )
+            break
         symbol = dictionary["symbol"]
         buyer = Buyer(symbol=symbol, cash=available_cash)
         qty = buyer.calc_position_size()
