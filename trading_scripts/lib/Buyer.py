@@ -141,7 +141,6 @@ class Buyer:
                 time_in_force="gtc",
                 trail_price=trail_price,
                 qty=buy_order.qty,
-                extended_hours=True,
             )
             log.success("Trailing Stop order created")
             log.info(

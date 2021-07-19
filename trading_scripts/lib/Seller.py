@@ -67,7 +67,6 @@ class Seller:
                     order_id=order.id,
                     stop_price=stop_price,
                     trail=trail_points,
-                    extended_hours=True,
                 )
                 log.success("Order updated")
                 print(sell_order)
