@@ -53,6 +53,14 @@ def get_requests_cache() -> CachedSession:
     )
 
 
+def get_open_sell_orders(client=api):
+    orders = client.list_orders(params={"side": "sell"})
+    output = []
+    for order in orders:
+        output.append(order.symbol)
+    return output
+
+
 def close_open_buy_orders(client=api):
     # log.debug("Closing open buy orders, if any")
     orders = client.list_orders(params={"side": "buy"})
@@ -105,3 +113,8 @@ def get_last_quote(symbol: str) -> float:
 def get_account() -> Account:
     account = api.get_account()
     return account
+
+
+def get_cash() -> Account:
+    account = get_account()
+    return float(account.cash)

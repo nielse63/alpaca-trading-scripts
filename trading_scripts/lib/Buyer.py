@@ -1,4 +1,5 @@
 import math
+import os
 from time import sleep
 
 import alpaca_trade_api.rest as alpaca
@@ -82,10 +83,8 @@ class Buyer:
 
     @property
     def available_cash(self):
-        if self._cash and not self.is_market_open:
-            return self._cash
         account = self.api.get_account()
-        return round(float(account.cash), 2)
+        return float(account.cash)
 
     @property
     def last_price(self):
@@ -105,27 +104,29 @@ class Buyer:
         risk_pct = 0.05
         last_price = self.last_price
         distance_to_stop = last_price / self.get_drawdown_points(ATR_MULTIPLIER)
-        position_qty = (available_cash * risk_pct) / distance_to_stop
-        return math.floor(position_qty)
+        position_qty = math.floor((available_cash * risk_pct) / distance_to_stop)
+        position_cost = position_qty * last_price
+        print(
+            f"available_cash: {available_cash}, position_qty: {position_qty}, position_cost {position_cost}"
+        )
+        return position_qty
 
-    def create_buy_order(self) -> alpaca.Order:
+    def create_buy_order(self, qty: int) -> alpaca.Order:
         # log.debug("Buyer#create_buy_order")
 
         # create a new buy order
         try:
-            qty = self.calc_position_size()
-            if qty > 0:
-                order = self.api.submit_order(
-                    symbol=self.symbol,
-                    side="buy",
-                    type="market",
-                    qty=qty,
-                    time_in_force="day",
-                )
-                log.success(f"Buy order for {qty} shares of {self.symbol} submitted")
+            order = self.api.submit_order(
+                symbol=self.symbol,
+                side="buy",
+                type="market",
+                qty=qty,
+                time_in_force="day",
+            )
+            log.success(f"Buy order for {qty} shares of {self.symbol} submitted")
+            return order
         except Exception as error:
             log.error(f"ERROR: {error}")
-        return order
 
     def create_trailing_stop_loss_order(self, buy_order: alpaca.Order):
         # create trailing stop loss order
@@ -160,6 +161,9 @@ class Buyer:
                     log.warning(f"Failure to cancel open buy order: {order.id}")
 
     def run(self):
+        if os.getenv("IS_TEST"):
+            log.info("Preventing purchase in test environment")
+            return
 
         # only run if market is open
         if not self.is_market_open:
@@ -176,12 +180,12 @@ class Buyer:
             return
 
         qty = self.calc_position_size()
-        if qty <= 0:
+        if qty < 1:
             # log.warning(f"0 qty order unfilled for {self.symbol}")
             return
 
         # buy assets
-        order = self.create_buy_order()
+        order = self.create_buy_order(qty)
 
         # prevent execution on error
         if not order:

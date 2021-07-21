@@ -1,7 +1,8 @@
 from finviz.screener import Screener
 
 from trading_scripts.lib.Backtester import Backtester
-from trading_scripts.utils.helpers import get_account
+from trading_scripts.utils.helpers import get_open_sell_orders
+from trading_scripts.utils.logger import logger as log
 
 
 def sort_fn(e):
@@ -15,12 +16,14 @@ def main() -> list[dict]:
 
     # log.debug(f"Finviz screener results: {len(stock_list)} items")
     output = []
-    account = get_account()
-    account_cash = float(account.cash)
-    print(f"account_cash: {account_cash}")
+    sell_order_symbols = get_open_sell_orders()
     for stock in stock_list:
         symbol = stock["Ticker"]
-        backtester = Backtester(symbol=symbol, cash=account_cash)
+        # don't buy  what we already have stake in - prevent PTD
+        if symbol in sell_order_symbols:
+            log.debug(f"Skipping {symbol} - open sell order already opened")
+            continue
+        backtester = Backtester(symbol=symbol)
         results = backtester.get_results()
 
         if results["return_pct"] < 7:
