@@ -7,11 +7,10 @@ from trading_scripts.utils.constants import (
     HISTORICAL_DATA_INTERVAL,
     HISTORICAL_DATA_PERIOD,
 )
-from trading_scripts.utils.helpers import (
+from trading_scripts.utils.helpers import (  # is_market_open,
     create_client,
     get_historical_data,
     get_last_quote,
-    is_market_open,
 )
 from trading_scripts.utils.logger import log
 
@@ -75,12 +74,28 @@ class Seller:
         except Exception as error:
             log.error(f"ERROR: {error}")
 
-    def run(self):
+    # def create_trailing_stop_loss_order(self):
+    #     try:
+    #         trail_price = self.get_drawdown_points()
+    #         sell_order = self.submit_order(
+    #             side="sell",
+    #             type="trailing_stop",
+    #             time_in_force="gtc",
+    #             trail_price=trail_price,
+    #             qty=buy_order.qty,
+    #         )
+    #         log.success("Trailing Stop order created")
+    #         log.info(
+    #             f"HWM: {sell_order.hwm}, Trail Price: {sell_order.trail_price}, Stop Price: {sell_order.stop_price}"
+    #         )
+    #     except Exception as error:
+    #         log.error(f"ERROR: {error}")
 
+    def run(self):
         # only run when market is open
-        if not is_market_open():
-            # print("Market is not open - stopping execution")
-            return
+        # if not is_market_open():
+        #     # print("Market is not open - stopping execution")
+        #     return
 
         log.info("Starting Seller.run")
 

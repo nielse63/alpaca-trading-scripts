@@ -1,16 +1,13 @@
 import math
 import os
-from time import sleep
 
 import alpaca_trade_api.rest as alpaca
 import pandas as pd
 from stockstats import StockDataFrame
 
-from trading_scripts.utils.constants import (
-    ATR_MULTIPLIER,
+from trading_scripts.utils.constants import (  # ATR_MULTIPLIER,; MAX_DRAWDOWN_PCT,
     HISTORICAL_DATA_INTERVAL,
     HISTORICAL_DATA_PERIOD,
-    MAX_DRAWDOWN_PCT,
 )
 from trading_scripts.utils.helpers import (
     create_client,
@@ -21,6 +18,8 @@ from trading_scripts.utils.helpers import (
 )
 from trading_scripts.utils.logger import log
 
+# from time import sleep
+
 
 class Buyer:
     symbol: str = ""
@@ -28,8 +27,13 @@ class Buyer:
     data: pd.DataFrame = None
     api: alpaca = None
 
-    def __init__(self, symbol: str = "", cash: float = None) -> None:
+    def __init__(
+        self, symbol: str = "", cash: float = None, sma_fast=10, sma_slow=25, atr=2
+    ) -> None:
         self.symbol = symbol
+        self.sma_fast = sma_fast
+        self.sma_slow = sma_slow
+        self.atr = atr
         self.api = create_client()
         self.positions = get_positions()
         self.is_market_open: bool = is_market_open()
@@ -72,13 +76,13 @@ class Buyer:
         )
 
     def sma_crossover_signal(self):
-        sma_fast = self.data.get("close_10_sma")
-        sma_slow = self.data.get("close_25_sma")
+        sma_fast = self.data.get(f"close_{self.sma_fast}_sma")
+        sma_slow = self.data.get(f"close_{self.sma_slow}_sma")
         return sma_fast.gt(sma_slow).iloc[-1]
 
-    def get_drawdown_points(self, factor: float):
+    def get_drawdown_points(self):
         atr = self.data.get("atr").iloc[-1]
-        output = factor * atr
+        output = self.atr * atr
         return round(output, 2)
 
     @property
@@ -90,20 +94,20 @@ class Buyer:
     def last_price(self):
         return get_last_quote(self.symbol)
 
-    def get_trailing_stop_loss_points(
-        self, price: float, get_drawdown_points: float = 5.0
-    ):
-        return min(
-            self.get_drawdown_points(get_drawdown_points),
-            round(price * MAX_DRAWDOWN_PCT, 2),
-        )
+    # def get_trailing_stop_loss_points(
+    #     self, price: float, get_drawdown_points: float = 5.0
+    # ):
+    #     return min(
+    #         self.get_drawdown_points(get_drawdown_points),
+    #         round(price * MAX_DRAWDOWN_PCT, 2),
+    #     )
 
     def calc_position_size(self):
         # Position Size = (Total Trading Account Size X Risk Percentage) / Distance to Stop Loss from entry
         available_cash = self.available_cash
         risk_pct = 0.05
         last_price = self.last_price
-        distance_to_stop = last_price / self.get_drawdown_points(ATR_MULTIPLIER)
+        distance_to_stop = last_price / self.get_drawdown_points()
         position_qty = math.floor((available_cash * risk_pct) / distance_to_stop)
         position_cost = position_qty * last_price
         print(
@@ -111,8 +115,10 @@ class Buyer:
         )
         return position_qty
 
-    def create_buy_order(self, qty: int) -> alpaca.Order:
+    def create_buy_order(self, qty: int = 0) -> alpaca.Order:
         # log.debug("Buyer#create_buy_order")
+        if not qty:
+            qty = self.calc_position_size()
 
         # create a new buy order
         try:
@@ -130,12 +136,13 @@ class Buyer:
 
     def create_trailing_stop_loss_order(self, buy_order: alpaca.Order):
         # create trailing stop loss order
-        if isinstance(buy_order, alpaca.Position):
-            price = buy_order.current_price
-        else:
-            price = buy_order.filled_avg_price
+        # if isinstance(buy_order, alpaca.Position):
+        #     price = buy_order.current_price
+        # else:
+        #     price = buy_order.filled_avg_price
         try:
-            trail_price = self.get_trailing_stop_loss_points(float(price))
+            trail_price = self.get_drawdown_points()
+            # trail_price = self.get_trailing_stop_loss_points(float(price))
             sell_order = self.submit_order(
                 side="sell",
                 type="trailing_stop",
@@ -165,16 +172,17 @@ class Buyer:
             log.info("Preventing purchase in test environment")
             return
 
-        # only run if market is open
-        if not self.is_market_open:
-            # print("Market is not open - preventing execution")
-            return
+        # # only run if market is open
+        # if not self.is_market_open:
+        #     # print("Market is not open - preventing execution")
+        #     return
 
-        log.info("Starting Buyer.run")
-        if self.symbol_is_in_portfolio:
-            # log.info(f"Preventing purchase of {self.symbol} - already in portfolio")
-            return
+        # log.info("Starting Buyer.run")
+        # if self.symbol_is_in_portfolio:
+        #     # log.info(f"Preventing purchase of {self.symbol} - already in portfolio")
+        #     return
 
+        # print(self.sma_crossover_signal())
         if not self.sma_crossover_signal():
             # log.info(f"No SMA crossover signal for {self.symbol}")
             return
@@ -185,22 +193,23 @@ class Buyer:
             return
 
         # buy assets
-        order = self.create_buy_order(qty)
+        self.create_buy_order(qty)
+        # order = self.create_buy_order(qty)
 
         # prevent execution on error
-        if not order:
-            log.warning("Preventing further execution after no buy order returned")
-            return
+        # if not order:
+        #     log.warning("Preventing further execution after no buy order returned")
+        #     return
 
-        # wait until the order is filled
-        count = 0
-        while order.status != "filled" and count < 15:
-            # log.debug(f"Buy order status: {order.status}")
-            sleep(0.1)
-            order = self.api.get_order(order.id)
-            count += 1
+        # # wait until the order is filled
+        # count = 0
+        # while order.status != "filled" and count < 15:
+        #     # log.debug(f"Buy order status: {order.status}")
+        #     sleep(0.1)
+        #     order = self.api.get_order(order.id)
+        #     count += 1
 
-        # create trailing stop loss order once the order is filled
-        if order.status == "filled":
-            log.success(f"Buy order for {self.symbol} filled")
-            self.create_trailing_stop_loss_order(order)
+        # # create trailing stop loss order once the order is filled
+        # if order.status == "filled":
+        #     log.success(f"Buy order for {self.symbol} filled")
+        #     self.create_trailing_stop_loss_order(order)

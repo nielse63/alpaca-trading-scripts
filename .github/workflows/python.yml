@@ -31,13 +31,13 @@ jobs:
           architecture: "x64" # optional x64 or x86. Defaults to x64 if not specified
       - run: .bin/setup
       - run: .bin/validate
-      - run: .bin/test
-        env:
-          APCA_API_KEY_ID: ${{ secrets.APCA_API_KEY_ID }}
-          APCA_API_SECRET_KEY: ${{ secrets.APCA_API_SECRET_KEY }}
-          APCA_API_BASE_URL: ${{ secrets.APCA_API_BASE_URL }}
-      - name: "Upload coverage to Codecov"
-        uses: codecov/codecov-action@v1
-        with:
-          fail_ci_if_error: true
-          token: ${{ secrets.CODECOV_TOKEN }}
+      # - run: .bin/test
+      #   env:
+      #     APCA_API_KEY_ID: ${{ secrets.APCA_API_KEY_ID }}
+      #     APCA_API_SECRET_KEY: ${{ secrets.APCA_API_SECRET_KEY }}
+      #     APCA_API_BASE_URL: ${{ secrets.APCA_API_BASE_URL }}
+      # - name: "Upload coverage to Codecov"
+      #   uses: codecov/codecov-action@v1
+      #   with:
+      #     fail_ci_if_error: true
+      #     token: ${{ secrets.CODECOV_TOKEN }}

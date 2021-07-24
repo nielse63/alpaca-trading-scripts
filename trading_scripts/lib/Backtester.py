@@ -32,8 +32,8 @@ def strfdelta(tdelta, fmt):
 
 
 class SmaCross(SignalStrategy, TrailingStrategy):
-    n1 = 10
-    n2 = 25
+    sma_fast = 10
+    sma_slow = 25
 
     def init(self):
         # In init() and in next() it is important to call the
@@ -41,8 +41,8 @@ class SmaCross(SignalStrategy, TrailingStrategy):
         super().init()
 
         # Precompute the two moving averages
-        sma1 = self.I(SMA, self.data.Close, self.n1)
-        sma2 = self.I(SMA, self.data.Close, self.n2)
+        sma1 = self.I(SMA, self.data.Close, self.sma_fast)
+        sma2 = self.I(SMA, self.data.Close, self.sma_slow)
 
         # Where sma1 crosses sma2 upwards. Diff gives us [-1,0, *1*]
         signal = (pd.Series(sma1) > sma2).astype(int).diff().fillna(0)
