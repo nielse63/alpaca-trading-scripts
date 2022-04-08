@@ -36,15 +36,15 @@ const DEFAULT_BARS_OPTIONS = {
   exchanges: 'CBSE',
   start: sub(new Date(), {
     // years: 1,
-    // months: 3,
-    weeks: 1,
+    months: 3,
+    // weeks: 1,
     // days: 7,
     // hours: 5,
     // minutes: 9,
     // seconds: 30
   }),
   end: new Date(),
-  timeframe: '15Min',
+  timeframe: '1Hour',
 };
 const SMA_SLOW_VALUE = 21;
 const SMA_FAST_VALUE = 7;
