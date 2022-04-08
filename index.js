@@ -4,12 +4,13 @@ const { SMA } = require('technicalindicators');
 const sub = require('date-fns/sub');
 const last = require('lodash/last');
 
-const alpaca = new Alpaca({
+const alpacaConfig = {
   keyId: process.env.APCA_API_KEY_ID,
   secretKey: process.env.APCA_API_SECRET_KEY,
-  paper: true,
-  // usePolygon: false,
-});
+  paper: process.env.APCA_API_BASE_URL === 'https://paper-api.alpaca.markets',
+};
+console.log({ alpacaConfig });
+const alpaca = new Alpaca(alpacaConfig);
 
 const getAccount = async () => {
   const account = await alpaca.getAccount();
@@ -44,7 +45,7 @@ const DEFAULT_BARS_OPTIONS = {
     // seconds: 30
   }),
   end: new Date(),
-  timeframe: '1Hour',
+  timeframe: '15Min',
 };
 const SMA_SLOW_VALUE = 21;
 const SMA_FAST_VALUE = 7;

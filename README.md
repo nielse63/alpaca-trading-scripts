@@ -20,3 +20,11 @@ npm start
 ```bash
 npm run dev
 ```
+
+### Productiono
+
+To execute in a production environment:
+
+```bash
+/path/to/run.sh
+```
