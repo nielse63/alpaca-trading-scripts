@@ -1,37 +1,30 @@
 # alpaca-trading-scripts
 
-## Setting up Ubuntu
+## Installation
 
 ```bash
-sudo apt-get update -y
-sudo apt-get upgrade -y
-
-# install python 3.9
-sudo apt install software-properties-common -y
-sudo add-apt-repository ppa:deadsnakes/ppa -y
-sudo apt install python3.9 -y
-
-# install venv
-sudo apt-get install python3-venv -y --upgrade
-.bin/setup
+git clone https://github.com/nielse63/alpaca-trading-scripts.git
+cd alpaca-trading-scripts
+nvm use
+npm ci
 ```
 
-## Deploying to production
+## Usage
 
 ```bash
-# ssh into prod instance
-ssh user@123.45.67.8
+npm start
+```
 
-# pull latest from remote
-cd alpaca-trading-scripts
-git checkout main
-git pull
+### Development
 
-# re-run production setup
-.bin/setup-prod
+```bash
+npm run dev
+```
 
-# some quick validation
-source activate
-python --version # 3.9.x
-python main.py
+### Productiono
+
+To execute in a production environment:
+
+```bash
+/path/to/run.sh
 ```
