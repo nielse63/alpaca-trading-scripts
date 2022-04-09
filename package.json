@@ -8,11 +8,12 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
+    "test:watch": "jest --watch",
     "prepare": "husky install",
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "lint": "eslint --fix . && prettier --write ."
+    "lint": "eslint --fix .; prettier --write ."
   },
   "repository": {
     "type": "git",
@@ -40,6 +41,8 @@
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-jest": "^26.1.4",
     "husky": "^7.0.4",
+    "jest": "^27.5.1",
+    "jest-extended": "^2.0.0",
     "lint-staged": "^12.3.7",
     "nodemon": "^2.0.15",
     "prettier": "^2.6.2"
