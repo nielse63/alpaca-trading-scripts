@@ -1,3 +1,4 @@
+const last = require('lodash/last');
 const { formatBar, getCryptoBars, getData } = require('../bars');
 const alpaca = require('../alpaca');
 const MOCK_BAR = require('../__fixtures__/bar');
@@ -42,16 +43,25 @@ describe('bars', () => {
     it('should get data array', async () => {
       const data = await getData(MOCK_BAR.Symbol);
       expect(data).toBeObject();
-      expect(data).toContainAllKeys([
-        'bars',
-        'vwapValues',
-        'smaFast',
-        'smaSlow',
-      ]);
+      expect(data).toContainAllKeys(['bars', 'values', 'smaFast', 'smaSlow']);
       expect(data.bars).toBeArray();
-      expect(data.vwapValues).toBeArray();
+      expect(data.values).toBeArray();
       expect(data.smaFast).toBeArray();
       expect(data.smaSlow).toBeArray();
+    });
+
+    it('should have null smaFast and smaSlow values in first object', async () => {
+      const data = await getData(MOCK_BAR.Symbol);
+      const [bar] = data.bars;
+      expect(bar.smaFast).toBeNull();
+      expect(bar.smaSlow).toBeNull();
+    });
+
+    it('should have valid sma values in last object', async () => {
+      const data = await getData(MOCK_BAR.Symbol);
+      const bar = last(data.bars);
+      expect(bar.smaFast).not.toBeNull();
+      expect(bar.smaSlow).not.toBeNull();
     });
   });
 });

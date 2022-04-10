@@ -1,5 +1,7 @@
 require('dotenv').config();
 const { SMA } = require('technicalindicators');
+const reverse = require('lodash/reverse');
+const get = require('lodash/get');
 const alpaca = require('./alpaca');
 const {
   DEFAULT_BARS_OPTIONS,
@@ -12,25 +14,6 @@ const formatBar = (bar) => ({
   Timestamp: new Date(bar.Timestamp),
 });
 
-/**
- *
- * @param {string} symbol
- * @param {object} options
- * @returns {object[]}
- * @example
- * {
- *    Symbol: 'BTCUSD',
- *    Timestamp: 2022-04-08T09:00:00.000Z,
- *    Exchange: 'FTXU',
- *    Open: 43726,
- *    High: 43750,
- *    Low: 43680,
- *    Close: 43680,
- *    Volume: 0.2175,
- *    TradeCount: 6,
- *    VWAP: 43682.72092
- *  }
- */
 const getCryptoBars = async (symbol, options = {}) => {
   const response = await alpaca.getCryptoBars(symbol, {
     ...DEFAULT_BARS_OPTIONS,
@@ -46,34 +29,32 @@ const getCryptoBars = async (symbol, options = {}) => {
 
 const getData = async (symbol, options = {}) => {
   const bars = await getCryptoBars(symbol, options);
-  const vwapValues = bars.map(({ VWAP }) => VWAP);
+  const values = bars.map(({ Close }) => Close);
   const smaFast = SMA.calculate({
     period: SMA_FAST_VALUE,
-    values: vwapValues,
+    values,
   });
   const smaSlow = SMA.calculate({
     period: SMA_SLOW_VALUE,
-    values: vwapValues,
+    values,
+  });
+  const reversed = {
+    smaFast: reverse(smaFast),
+    smaSlow: reverse(smaSlow),
+    bars: reverse(bars),
+  };
+  const reversedBarsWithSMA = reversed.bars.map((bar, index) => {
+    const output = {
+      ...bar,
+      smaFast: get(reversed, `smaFast[${index}]`, null),
+      smaSlow: get(reversed, `smaSlow[${index}]`, null),
+    };
+    return output;
   });
 
   return {
-    bars: bars.map((bar, index) => {
-      const output = {
-        ...bar,
-        smaFast: null,
-        smaSlow: null,
-      };
-      const smaFastIndex = index - SMA_FAST_VALUE + 1;
-      const smaSlowIndex = index - SMA_SLOW_VALUE + 1;
-      if (smaFastIndex > -1) {
-        output.smaFast = smaFast[smaFastIndex];
-      }
-      if (smaSlowIndex > -1) {
-        output.smaSlow = smaFast[smaSlowIndex];
-      }
-      return output;
-    }),
-    vwapValues,
+    bars: reverse(reversedBarsWithSMA),
+    values,
     smaFast,
     smaSlow,
   };

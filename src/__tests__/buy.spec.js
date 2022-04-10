@@ -55,8 +55,8 @@ describe('buy', () => {
     it('should return false if sma fast < VWAP', () => {
       const shouldBuy = getShouldBuy({
         ...MOCK_BAR,
-        smaFast: MOCK_BAR.VWAP + 10,
-        smaSlow: MOCK_BAR.VWAP - 20,
+        smaFast: MOCK_BAR.Close + 10,
+        smaSlow: MOCK_BAR.Close - 20,
       });
       expect(shouldBuy).toBe(false);
     });
@@ -64,8 +64,8 @@ describe('buy', () => {
     it('should return false if sma fast < sma slow', () => {
       const shouldBuy = getShouldBuy({
         ...MOCK_BAR,
-        smaFast: MOCK_BAR.VWAP - 20,
-        smaSlow: MOCK_BAR.VWAP + 10,
+        smaFast: MOCK_BAR.Close - 20,
+        smaSlow: MOCK_BAR.Close + 10,
       });
       expect(shouldBuy).toBe(false);
     });
@@ -73,8 +73,8 @@ describe('buy', () => {
     it('should return true if VWAP > sma fast and sma fast > sma slow', () => {
       const shouldBuy = getShouldBuy({
         ...MOCK_BAR,
-        smaFast: MOCK_BAR.VWAP - 10,
-        smaSlow: MOCK_BAR.VWAP - 20,
+        smaFast: MOCK_BAR.Close - 10,
+        smaSlow: MOCK_BAR.Close - 20,
       });
       expect(shouldBuy).toBe(true);
     });
