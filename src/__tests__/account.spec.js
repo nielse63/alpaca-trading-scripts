@@ -33,7 +33,7 @@ const accountKeys = [
   'daytrade_count',
 ];
 
-describe('account', () => {
+describe.skip('account', () => {
   describe('getAccount', () => {
     it('should get account', async () => {
       const account = await getAccount();
