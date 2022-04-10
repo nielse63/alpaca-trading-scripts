@@ -10,7 +10,7 @@ const buy = async (symbol) => {
   const price = latestQuote.AskPrice;
   const cash = await getCash();
   const qty = cash / price;
-  console.log({ latestQuote, price, cash, qty });
+  // console.log({ latestQuote, price, cash, qty });
   if (qty <= 0.0001) {
     console.log('Not enough buying power for purchase');
     return null;
@@ -27,7 +27,7 @@ const buy = async (symbol) => {
 };
 
 const getShouldBuy = (lastBar) =>
-  lastBar.VWAP > lastBar.smaFast && lastBar.smaFast > lastBar.smaSlow;
+  lastBar.Close > lastBar.smaFast && lastBar.smaFast > lastBar.smaSlow;
 
 exports.buy = buy;
 exports.getShouldBuy = getShouldBuy;
