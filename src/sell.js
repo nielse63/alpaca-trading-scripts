@@ -26,6 +26,7 @@ const sell = async (symbol) => {
 };
 
 const getShouldSell = async (lastBar) => {
+  console.log(lastBar);
   const exists = await hasPosition(lastBar.Symbol);
   return (
     exists &&

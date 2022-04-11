@@ -63,8 +63,10 @@ describe('sell', () => {
         .mockImplementation(() => Promise.resolve([]));
       const shouldSell = await getShouldSell({
         ...MOCK_BAR,
-        smaFast: MOCK_BAR.Close + 10,
-        smaSlow: MOCK_BAR.Close - 20,
+        SMA: {
+          fast: MOCK_BAR.Close + 10,
+          slow: MOCK_BAR.Close - 20,
+        },
       });
       expect(shouldSell).toBe(false);
       expect(getPositionsMock).toHaveBeenCalled();
@@ -73,8 +75,10 @@ describe('sell', () => {
     it('should return false if VWAP > sma fast', async () => {
       const shouldSell = await getShouldSell({
         ...MOCK_BAR,
-        smaFast: MOCK_BAR.Close + 10,
-        smaSlow: MOCK_BAR.Close - 20,
+        SMA: {
+          fast: MOCK_BAR.Close + 10,
+          slow: MOCK_BAR.Close - 20,
+        },
       });
       expect(shouldSell).toBe(false);
     });
@@ -82,8 +86,10 @@ describe('sell', () => {
     it('should return false if sma fast > sma slow', async () => {
       const shouldSell = await getShouldSell({
         ...MOCK_BAR,
-        smaFast: MOCK_BAR.Close - 10,
-        smaSlow: MOCK_BAR.Close - 20,
+        SMA: {
+          fast: MOCK_BAR.Close - 10,
+          slow: MOCK_BAR.Close - 20,
+        },
       });
       expect(shouldSell).toBe(false);
     });
@@ -91,8 +97,10 @@ describe('sell', () => {
     it('should return true if position is held, sma fast < sma slow, and VWAP < sma fast', async () => {
       const shouldSell = await getShouldSell({
         ...MOCK_BAR,
-        smaFast: MOCK_BAR.Close + 10,
-        smaSlow: MOCK_BAR.Close + 20,
+        SMA: {
+          fast: MOCK_BAR.Close + 10,
+          slow: MOCK_BAR.Close + 20,
+        },
       });
       expect(shouldSell).toBe(true);
     });

@@ -42,6 +42,7 @@ describe('bars', () => {
   describe('getBars', () => {
     it('should get data array', async () => {
       const bars = await getBars(MOCK_BAR.Symbol);
+      // console.log(bars);
       expect(bars).toBeArray();
       expect(getCryptoBarsMock).toHaveBeenCalledOnce();
       // expect(data).toBeObject();

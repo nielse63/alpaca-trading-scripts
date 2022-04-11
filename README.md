@@ -9,6 +9,11 @@ nvm use
 npm ci
 ```
 
+## Requirements
+
+1. Using a pre-defined strategy, execute trades based on historical market data
+2.
+
 ## Usage
 
 ```bash

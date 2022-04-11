@@ -19,6 +19,7 @@ const DEFAULT_BARS_OPTIONS = {
 };
 const SMA_SLOW_VALUE = 25;
 const SMA_FAST_VALUE = 10;
+const RSI_INTERVAL = 14;
 const PRICE_VALUE_KEY = 'Close';
 
 module.exports = {
@@ -26,5 +27,6 @@ module.exports = {
   DEFAULT_BARS_OPTIONS,
   SMA_SLOW_VALUE,
   SMA_FAST_VALUE,
+  RSI_INTERVAL,
   PRICE_VALUE_KEY,
 };
