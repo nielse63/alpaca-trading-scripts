@@ -1,12 +1,14 @@
 const sub = require('date-fns/sub');
 
+const SYMBOL = 'BTCUSD';
+
 const DEFAULT_BARS_OPTIONS = {
-  // limit: 600,
+  // limit: 100,
   exchanges: 'FTXU',
   start: sub(new Date(), {
     // years: 1,
     // months: 1,
-    weeks: 3,
+    weeks: 1,
     // days: 7,
     // hours: 5,
     // minutes: 9,
@@ -17,9 +19,12 @@ const DEFAULT_BARS_OPTIONS = {
 };
 const SMA_SLOW_VALUE = 25;
 const SMA_FAST_VALUE = 10;
+const PRICE_VALUE_KEY = 'Close';
 
 module.exports = {
+  SYMBOL,
   DEFAULT_BARS_OPTIONS,
   SMA_SLOW_VALUE,
   SMA_FAST_VALUE,
+  PRICE_VALUE_KEY,
 };

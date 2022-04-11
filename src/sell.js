@@ -29,8 +29,8 @@ const getShouldSell = async (lastBar) => {
   const exists = await hasPosition(lastBar.Symbol);
   return (
     exists &&
-    lastBar.Close <= lastBar.smaFast &&
-    lastBar.smaFast <= lastBar.smaSlow
+    lastBar.Close <= lastBar.SMA.fast &&
+    lastBar.SMA.fast <= lastBar.SMA.slow
   );
 };
 

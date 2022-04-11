@@ -1,7 +1,7 @@
 require('dotenv').config();
 const last = require('lodash/last');
 const { getAccount } = require('./src/account');
-const { getData } = require('./src/bars');
+const getBars = require('./src/bars');
 const { buy, getShouldBuy } = require('./src/buy');
 const { sell, getShouldSell } = require('./src/sell');
 
@@ -16,11 +16,11 @@ const main = async () => {
   }
 
   // get data
-  const data = await getData(SYMBOL);
-  const lastBar = last(data.bars);
+  const bars = await getBars(SYMBOL);
+  const lastBar = last(bars);
 
   // determine if we should buy or sell
-  const shouldBuy = getShouldBuy(lastBar);
+  const shouldBuy = await getShouldBuy(lastBar);
   const shouldSell = await getShouldSell(lastBar);
   console.log({ lastBar, shouldBuy, shouldSell });
 

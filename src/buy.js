@@ -26,8 +26,8 @@ const buy = async (symbol) => {
   return order;
 };
 
-const getShouldBuy = (lastBar) =>
-  lastBar.Close > lastBar.smaFast && lastBar.smaFast > lastBar.smaSlow;
+const getShouldBuy = async (lastBar) =>
+  lastBar.Close > lastBar.SMA.fast && lastBar.SMA.fast > lastBar.SMA.slow;
 
 exports.buy = buy;
 exports.getShouldBuy = getShouldBuy;
