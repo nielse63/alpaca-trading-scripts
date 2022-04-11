@@ -52,7 +52,7 @@ describe('buy', () => {
   });
 
   describe('getShouldBuy', () => {
-    it('should return false if sma fast < VWAP', async () => {
+    it('should return false if sma fast < Close', async () => {
       const shouldBuy = await getShouldBuy({
         ...MOCK_BAR,
         SMA: {
@@ -74,9 +74,26 @@ describe('buy', () => {
       expect(shouldBuy).toBe(false);
     });
 
-    it('should return true if VWAP > sma fast and sma fast > sma slow', async () => {
+    it('should return false if trend.up is false', async () => {
       const shouldBuy = await getShouldBuy({
         ...MOCK_BAR,
+        Trend: {
+          up: false,
+        },
+        SMA: {
+          fast: MOCK_BAR.Close - 10,
+          slow: MOCK_BAR.Close - 20,
+        },
+      });
+      expect(shouldBuy).toBe(false);
+    });
+
+    it('should return true if trend.up = true, Close > sma fast, and sma fast > sma slow', async () => {
+      const shouldBuy = await getShouldBuy({
+        ...MOCK_BAR,
+        Trend: {
+          up: true,
+        },
         SMA: {
           fast: MOCK_BAR.Close - 10,
           slow: MOCK_BAR.Close - 20,

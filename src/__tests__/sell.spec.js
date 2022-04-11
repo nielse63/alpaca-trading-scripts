@@ -57,10 +57,14 @@ describe('sell', () => {
   });
 
   describe('getShouldSell', () => {
-    it('should return false if the position isnt held', async () => {
+    it('should call getPositions', async () => {
       getPositionsMock = jest
         .spyOn(alpaca, 'getPositions')
         .mockImplementation(() => Promise.resolve([]));
+      expect(getPositionsMock).toHaveBeenCalled();
+    });
+
+    it('should return false if the position isnt held', async () => {
       const shouldSell = await getShouldSell({
         ...MOCK_BAR,
         SMA: {
@@ -69,10 +73,9 @@ describe('sell', () => {
         },
       });
       expect(shouldSell).toBe(false);
-      expect(getPositionsMock).toHaveBeenCalled();
     });
 
-    it('should return false if VWAP > sma fast', async () => {
+    it('should return false if Close > sma fast', async () => {
       const shouldSell = await getShouldSell({
         ...MOCK_BAR,
         SMA: {
@@ -94,7 +97,7 @@ describe('sell', () => {
       expect(shouldSell).toBe(false);
     });
 
-    it('should return true if position is held, sma fast < sma slow, and VWAP < sma fast', async () => {
+    it('should return true if position is held, sma fast < sma slow, and Close < sma fast', async () => {
       const shouldSell = await getShouldSell({
         ...MOCK_BAR,
         SMA: {

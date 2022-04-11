@@ -4,7 +4,6 @@ const { getPosition, hasPosition } = require('./positions');
 
 const sell = async (symbol) => {
   const position = await getPosition(symbol);
-  // console.log({ symbol, position });
   if (!position) {
     console.log('Position not found');
     return null;
@@ -26,7 +25,6 @@ const sell = async (symbol) => {
 };
 
 const getShouldSell = async (lastBar) => {
-  console.log(lastBar);
   const exists = await hasPosition(lastBar.Symbol);
   return (
     exists &&

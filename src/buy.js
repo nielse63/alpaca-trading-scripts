@@ -1,4 +1,5 @@
 require('dotenv').config();
+const get = require('lodash/get');
 const alpaca = require('./alpaca');
 const { getCash } = require('./account');
 const { DEFAULT_BARS_OPTIONS } = require('./constants');
@@ -26,8 +27,12 @@ const buy = async (symbol) => {
   return order;
 };
 
-const getShouldBuy = async (lastBar) =>
-  lastBar.Close > lastBar.SMA.fast && lastBar.SMA.fast > lastBar.SMA.slow;
+const getShouldBuy = async (lastBar) => {
+  const close = get(lastBar, 'Close', 0);
+  const sma = get(lastBar, 'SMA', { fast: 0, slow: 0 });
+  const trend = get(lastBar, 'Trend', { up: false });
+  return trend.up && close > sma.fast && sma.fast > sma.slow;
+};
 
 exports.buy = buy;
 exports.getShouldBuy = getShouldBuy;
