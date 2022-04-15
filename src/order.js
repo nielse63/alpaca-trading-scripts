@@ -114,7 +114,7 @@ const updateStopLossOrder = async (symbol) => {
     return null;
   }
   // console.log(alpaca);
-  const newStopLossOrder = alpaca.replaceOrder(stopLossOrder.id, {
+  const newStopLossOrder = await alpaca.replaceOrder(stopLossOrder.id, {
     symbol,
     qty: position.qty,
     side: 'sell',
