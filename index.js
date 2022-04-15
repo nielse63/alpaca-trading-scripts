@@ -5,6 +5,7 @@ const { getAccount } = require('./src/account');
 const getBars = require('./src/bars');
 const { buy, getShouldBuy } = require('./src/buy');
 const { sell, getShouldSell } = require('./src/sell');
+const { updateStopLossOrder } = require('./src/order');
 
 const main = async () => {
   const account = await getAccount();
@@ -28,6 +29,9 @@ const main = async () => {
   } else if (shouldSell) {
     await sell(SYMBOL);
   }
+
+  // update stop loss orders
+  await updateStopLossOrder(SYMBOL);
 };
 
 (async () => {
