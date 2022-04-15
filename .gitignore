@@ -131,3 +131,5 @@ dist
 
 .env
 tmp/*
+data/*
+!data/.gitkeep
