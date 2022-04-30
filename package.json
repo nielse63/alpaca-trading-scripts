@@ -27,7 +27,7 @@
   },
   "homepage": "https://github.com/nielse63/alpaca-trading-scripts#readme",
   "dependencies": {
-    "@alpacahq/alpaca-trade-api": "^2.13.0",
+    "@alpacahq/alpaca-trade-api": "^2.15.0",
     "date-fns": "^2.28.0",
     "dotenv": "^16.0.0",
     "dotenv-cli": "^5.1.0",
