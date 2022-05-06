@@ -39,10 +39,9 @@ const buy = async (symbol) => {
 };
 
 const getShouldBuy = async (lastBar) => {
-  const close = get(lastBar, 'Close', 0);
   const sma = get(lastBar, 'SMA', { fast: 0, slow: 0 });
   const trend = get(lastBar, 'Trend', { up: false });
-  return trend.up && close > sma.fast && sma.fast > sma.slow;
+  return trend.up && sma.fast > sma.slow;
 };
 
 exports.buy = buy;

@@ -1,4 +1,5 @@
 require('dotenv').config();
+const get = require('lodash/get');
 const alpaca = require('./alpaca');
 const { getPosition, hasPosition } = require('./positions');
 
@@ -26,11 +27,9 @@ const sell = async (symbol) => {
 
 const getShouldSell = async (lastBar) => {
   const exists = await hasPosition(lastBar.Symbol);
-  return (
-    exists &&
-    lastBar.Close <= lastBar.SMA.fast &&
-    lastBar.SMA.fast <= lastBar.SMA.slow
-  );
+  if (!exists) return false;
+  const trend = get(lastBar, 'Trend', { nb: false, down: false });
+  return (trend.nb || trend.down) && lastBar.SMA.fast <= lastBar.SMA.slow;
 };
 
 exports.sell = sell;
