@@ -4,8 +4,12 @@
 name: pr-check
 
 on:
+  push:
+    branches:
+      - main
   pull_request:
-    branches: [main]
+    branches:
+      - main
 
 env:
   ALPACA_URL: ${{ secrets.ALPACA_URL }}
@@ -22,6 +26,12 @@ jobs:
         with:
           node-version: 16.19.0
           cache: 'npm'
+      - uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
       - run: npm ci
       - run: npm test -- --coverage
       - name: Codecov
