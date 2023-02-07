@@ -133,3 +133,4 @@ dist
 tmp/*
 data/*
 !data/.gitkeep
+.vscode

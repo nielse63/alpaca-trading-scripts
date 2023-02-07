@@ -1,6 +1,6 @@
 import { SYMBOL } from './constants';
 import alpaca from './alpaca';
-import { get as getAccount } from './account';
+import { getBuyingPower } from './account';
 import { getLastBar } from './bars';
 import { getPositions } from './position';
 // import MockQuote from './__fixtures__/quote';
@@ -22,12 +22,15 @@ export const waitForOrderFill = (orderId: string) =>
   });
 
 export const getShouldBuy = async () => {
-  const account = await getAccount();
-  const { non_marginable_buying_power: buyingPower } = account;
+  const buyingPower = await getBuyingPower();
 
   // true if sma_fast > sma_slow
   const { sma } = await getLastBar();
-  return buyingPower > 1 && sma.fast > sma.slow;
+  const output = buyingPower > 1 && sma.fast > sma.slow;
+  console.log(
+    `should buy: ${output} (buyingPower = ${buyingPower}; sma.fast = ${sma.fast}; sma.slow = ${sma.slow})`
+  );
+  return output;
 };
 
 export const buy = async () => {
@@ -35,8 +38,7 @@ export const buy = async () => {
   await alpaca.cancelAllOrders();
 
   // get available buying power - if <$1, return
-  const account = await getAccount();
-  const { non_marginable_buying_power: buyingPower } = account;
+  const buyingPower = await getBuyingPower();
 
   // determine if we meet buy conditions
   if (await getShouldBuy()) {
@@ -55,7 +57,11 @@ export const buy = async () => {
 export const getShouldSell = async () => {
   const positions = await getPositions();
   const { sma } = await getLastBar();
-  return positions.length && sma.fast < sma.slow;
+  const output = positions.length && sma.fast < sma.slow;
+  console.log(
+    `should sell: ${output} (positions.length = ${positions.length}; sma.fast = ${sma.fast}; sma.slow = ${sma.slow})`
+  );
+  return output;
 };
 
 export const sell = async () => {

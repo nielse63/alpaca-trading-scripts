@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -e
+
+root=$(dirname $(dirname "$0"))
+if ! [ -d "$root" ]; then
+  echo "value of \$root is not a directory - exiting"
+  exit 1
+fi
+
+cd "$root"
+
+if ! [ -d "$root/node_modules" ]; then
+  npm ci
+fi
+if ! [ -d "$root/dist" ]; then
+  npm run build
+fi
+
+npm start

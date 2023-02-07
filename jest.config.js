@@ -3,6 +3,8 @@
  * https://jestjs.io/docs/en/configuration.html
  */
 
+const coverageReporters = process.env.CI ? ['lcov'] : ['html'];
+
 module.exports = {
   // All imported modules in your tests should be mocked automatically
   // automock: false,
@@ -14,30 +16,31 @@ module.exports = {
   // cacheDirectory: "/private/var/folders/34/hwxs5t3n7hq9jv3r5q8wspg40000gn/T/jest_dx",
 
   // Automatically clear mock calls and instances between every test
-  clearMocks: true,
+  // clearMocks: true,
 
   // Indicates whether the coverage information should be collected while executing the test
   // collectCoverage: false,
 
   // An array of glob patterns indicating a set of files for which coverage information should be collected
-  // collectCoverageFrom: undefined,
+  collectCoverageFrom: ['src/**/*.ts'],
 
   // The directory where Jest should output its coverage files
   // coverageDirectory: undefined,
 
   // An array of regexp pattern strings used to skip coverage collection
-  coveragePathIgnorePatterns: ['/node_modules/', '/dist/'],
+  coveragePathIgnorePatterns: [
+    '/node_modules/',
+    '/dist/',
+    '/__fixtures__/',
+    '/__tests__/',
+    '<rootDir>/src/types.d.ts',
+  ],
 
   // Indicates which provider should be used to instrument code for coverage
   coverageProvider: 'babel',
 
   // A list of reporter names that Jest uses when writing coverage reports
-  coverageReporters: [
-    'html',
-    'text-summary',
-    'lcov',
-    // "json"
-  ],
+  coverageReporters: ['text-summary', ...coverageReporters],
 
   // An object that configures minimum threshold enforcement for coverage results
   // coverageThreshold: undefined,

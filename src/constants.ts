@@ -1,31 +1,10 @@
 import { ICacheObject } from './types';
 
+export const PAPER_URL = 'https://paper-api.alpaca.markets';
 export const SYMBOL = 'MSFT';
 export const SMA_FAST_INTERVAL = 7;
 export const SMA_SLOW_INTERVAL = 14;
 export const LOOKBACK_LIMIT = 50;
-export const ACCOUNT_NUMERIC_KEYS = [
-  'buying_power',
-  'regt_buying_power',
-  'daytrading_buying_power',
-  'effective_buying_power',
-  'non_marginable_buying_power',
-  'bod_dtbp',
-  'cash',
-  'accrued_fees',
-  'pending_transfer_in',
-  'portfolio_value',
-  'multiplier',
-  'equity',
-  'last_equity',
-  'long_market_value',
-  'short_market_value',
-  'position_market_value',
-  'initial_margin',
-  'maintenance_margin',
-  'last_maintenance_margin',
-  'sma',
-];
 export const cache: ICacheObject = {
   alpaca: null,
   account: {

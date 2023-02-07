@@ -1,25 +1,17 @@
-import { ACCOUNT_NUMERIC_KEYS, cache } from './constants';
+import { cache } from './constants';
 import alpaca from './alpaca';
+import { parseResponseObject } from './helpers';
 
-export const get = async () => {
+export const getAccount = async () => {
   if (!cache.account.id) {
     const response = await alpaca.getAccount();
-    const account = Object.entries(response).reduce(
-      (previousValue, [key, value]) => {
-        const newValue =
-          ACCOUNT_NUMERIC_KEYS.includes(key) && typeof value === 'string'
-            ? parseFloat(value)
-            : value;
-        return {
-          ...previousValue,
-          [key]: newValue,
-        };
-      },
-      { ...cache.account }
-    );
+    const account = parseResponseObject(response);
     cache.account = account;
   }
   return cache.account;
 };
 
-export default get;
+export const getBuyingPower = async () => {
+  const account = await getAccount();
+  return account.cash;
+};

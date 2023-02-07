@@ -13,7 +13,7 @@ export interface IDateObject {
   session_close: string;
 }
 
-export interface AlpacaAccount {
+export type AlpacaAccount = {
   id: string;
   account_number: string;
   status: string;
@@ -49,7 +49,7 @@ export interface AlpacaAccount {
   daytrade_count: number;
   balance_asof: string;
   crypto_tier: number;
-}
+};
 
 export type BarSMA = {
   sma: {

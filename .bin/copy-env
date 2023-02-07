@@ -1,33 +1,35 @@
-#!/usr/bin/env python3
-import pathlib
-import re
+#!/usr/bin/env node
+const fs = require('fs-extra');
+const path = require('path');
 
-filename = pathlib.Path(__file__).parent.parent / ".env"
+const copyEnv = async () => {
+  const envfile = path.resolve(__dirname, '../.env');
+  const samplefile = path.resolve(__dirname, '../.env.sample');
 
-if not filename.exists():
-    raise FileNotFoundError(f".env file not found at {filename}")
+  if (!fs.existsSync(envfile)) {
+    console.warn('.env file not found - exiting');
+    process.exit();
+  }
 
-with open(filename) as f:
-    content = f.readlines()
+  const content = await fs.readFile(envfile, 'utf-8');
+  const lines = content.split('\n');
+  const newLines = lines
+    .filter((line) => {
+      return !!line.trim() && !line.startsWith('#');
+    })
+    .map((line) => {
+      const [key, value] = line.split('=');
+      let newValue = value;
+      if (/"|'/.test(value)) {
+        newValue = '""';
+      } else {
+        newValue = '';
+      }
+      return `${key.trim()}=${newValue.trim()}`;
+    });
+  const sampleContent = newLines.join('\n');
+  await fs.writeFile(samplefile, sampleContent);
+  console.log('updated .env.sample');
+};
 
-new_content = []
-is_ignoring = False
-for line in content:
-    if not is_ignoring and "ignore_start" in line:
-        is_ignoring = True
-    if is_ignoring and "ignore_end" in line:
-        is_ignoring = False
-        continue
-    if is_ignoring:
-        continue
-    if line.startswith("#") or line == "":
-        continue
-    new_line = re.sub(r"'", '"', line).strip()
-    new_line = re.sub(r"\"(.*?)\"", '""', new_line)
-    new_content.append(new_line)
-new_file_content = "\n".join(new_content).strip()
-
-output_file = pathlib.Path(__file__).parent.parent / ".env.sample"
-with open(output_file, "w") as f:
-    f.write(new_file_content)
-print(".env.sample update complete")
+copyEnv().catch(console.error);
