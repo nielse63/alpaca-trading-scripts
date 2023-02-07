@@ -5,13 +5,20 @@ module.exports = {
     browser: true,
     jest: true,
   },
-  plugins: ['import', 'prettier', 'jest', '@typescript-eslint'],
+  plugins: [
+    '@typescript-eslint',
+    'import',
+    'prettier',
+    'jest',
+    'jest-extended',
+  ],
   extends: [
     'airbnb-typescript/base',
     'prettier',
     'plugin:jest/recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:import/typescript',
+    'plugin:jest-extended/all',
   ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
@@ -36,10 +43,11 @@ module.exports = {
         exceptAfterSingleLine: true,
       },
     ],
+    '@typescript-eslint/no-unused-vars': 'error',
   },
   overrides: [
     {
-      files: ['.bin/**/*', '**/*.spec.{js,ts}'],
+      files: ['.bin/**/*', '**/*.spec.{js,ts}', '*.d.ts'],
       rules: {
         'import/no-extraneous-dependencies': 'off',
         'no-underscore-dangle': 'off',

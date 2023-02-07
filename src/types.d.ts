@@ -3,6 +3,7 @@ import {
   AlpacaTrade,
   AlpacaBar,
 } from '@alpacahq/alpaca-trade-api/dist/resources/datav2/entityv2';
+import Alpaca from '@alpacahq/alpaca-trade-api';
 
 export interface IDateObject {
   date: string;
@@ -98,6 +99,7 @@ export type AlpacaOrder = {
 
 export interface ICacheObject {
   isMarketOpen?: boolean;
+  alpaca?: Alpaca | null;
   account: AlpacaAccount;
   bars: IBar[];
 }
