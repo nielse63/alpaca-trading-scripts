@@ -10,9 +10,9 @@ on:
     branches: [main]
 
 env:
-  APCA_API_KEY_ID: ${{ secrets.APCA_API_KEY_ID }}
-  APCA_API_SECRET_KEY: ${{ secrets.APCA_API_SECRET_KEY }}
-  APCA_API_BASE_URL: ${{ secrets.APCA_API_BASE_URL }}
+  ALPACA_URL: ${{ secrets.ALPACA_URL }}
+  ALPACA_KEY: ${{ secrets.ALPACA_KEY }}
+  ALPACA_SECRET: ${{ secrets.ALPACA_SECRET }}
 
 jobs:
   build:

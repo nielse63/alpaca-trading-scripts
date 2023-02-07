@@ -1,5 +1,6 @@
 !.*.js
 !.bin/
-coverage
-tmp
-logs
+**/coverage/**
+**/tmp/**
+**/logs/**
+**/dist/**

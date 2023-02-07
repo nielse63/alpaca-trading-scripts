@@ -8,7 +8,7 @@
     "**/data/**": true
   },
   "editor.codeActionsOnSave": {
-    "source.organizeImports": true,
+    "source.organizeImports": false,
     "source.fixAll.eslint": true,
     "source.fixAll": true
   },
