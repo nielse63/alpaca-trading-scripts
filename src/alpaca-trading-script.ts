@@ -1,8 +1,7 @@
-import { SYMBOL } from './constants';
-import alpaca from './alpaca';
 import { getIsMarketOpen } from './clock';
 import { get as getAccount } from './account';
 import { buy, sell } from './order';
+import { getPositions } from './position';
 
 const alpacaTradingScript = async () => {
   // make sure the market is open
@@ -21,7 +20,7 @@ const alpacaTradingScript = async () => {
   }
 
   // get positions
-  const positions = await alpaca.getPosition(SYMBOL);
+  const positions = await getPositions();
 
   // execute trades if conditions are met
   if (positions.length) {

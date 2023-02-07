@@ -1,6 +1,6 @@
 import findLastIndex from 'lodash/findLastIndex';
 import moment from 'moment';
-import { IDateObject } from './types.d';
+import { IDateObject } from './types';
 import { LOOKBACK_LIMIT, cache } from './constants';
 import alpaca from './alpaca';
 

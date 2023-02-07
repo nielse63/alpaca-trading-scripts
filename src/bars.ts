@@ -1,5 +1,5 @@
 import { SMA } from 'trading-signals';
-import { AlpacaBar } from './types.d';
+import { AlpacaBar } from './types';
 import {
   SYMBOL,
   SMA_FAST_INTERVAL,

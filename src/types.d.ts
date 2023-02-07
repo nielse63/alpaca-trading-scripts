@@ -61,40 +61,11 @@ export type BarSMA = {
 type IBar = AlpacaBar & BarSMA;
 
 export type AlpacaOrder = {
-  id: string;
-  client_order_id: string;
-  created_at: string;
-  updated_at: string;
-  submitted_at: string;
-  filled_at: any;
-  expired_at: any;
-  canceled_at: any;
-  failed_at: any;
-  replaced_at: any;
-  replaced_by: any;
-  replaces: any;
-  asset_id: any;
-  symbol: any;
-  asset_class: any;
-  notional: any;
-  qty: any;
-  filled_qty: any;
-  filled_avg_price: any;
-  order_class: string;
-  order_type: string;
-  type: string;
-  side: string;
-  time_in_force: string;
-  limit_price: any;
-  stop_price: any;
-  status: string;
-  extended_hours: boolean;
-  legs: any;
-  trail_percent: any;
-  trail_price: any;
-  hwm: any;
-  subtag: any;
-  source: any;
+  [key: string]: string | number | boolean;
+};
+
+export type AlpacaPosition = {
+  [key: string]: string | number | boolean;
 };
 
 export interface ICacheObject {
@@ -102,6 +73,7 @@ export interface ICacheObject {
   alpaca?: Alpaca | null;
   account: AlpacaAccount;
   bars: IBar[];
+  positions: AlpacaPosition[];
 }
 
 export { IBar, AlpacaBar, AlpacaQuote, AlpacaTrade };

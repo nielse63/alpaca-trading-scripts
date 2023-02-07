@@ -4,7 +4,6 @@ export const SYMBOL = 'MSFT';
 export const SMA_FAST_INTERVAL = 7;
 export const SMA_SLOW_INTERVAL = 14;
 export const LOOKBACK_LIMIT = 50;
-export const TRAIL_STOP_LOSS_PERCENT = 5.0;
 export const ACCOUNT_NUMERIC_KEYS = [
   'buying_power',
   'regt_buying_power',
@@ -67,4 +66,5 @@ export const cache: ICacheObject = {
     crypto_tier: 0,
   },
   bars: [],
+  positions: [],
 };
