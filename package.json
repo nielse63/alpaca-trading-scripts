@@ -30,7 +30,7 @@
     "@alpacahq/alpaca-trade-api": "^2.15.0",
     "date-fns": "^2.28.0",
     "dotenv": "^16.0.0",
-    "dotenv-cli": "^5.1.0",
+    "dotenv-cli": "^7.0.0",
     "fs-extra": "^10.1.0",
     "lodash": "^4.17.21",
     "technicalindicators": "^3.1.0",
