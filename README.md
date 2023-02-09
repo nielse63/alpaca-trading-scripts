@@ -9,14 +9,10 @@ nvm use
 npm ci
 ```
 
-## Requirements
-
-1. Using a pre-defined strategy, execute trades based on historical market data
-2.
-
 ## Usage
 
 ```bash
+npm run build
 npm start
 ```
 
@@ -26,10 +22,20 @@ npm start
 npm run dev
 ```
 
+### Testing
+
+```bash
+npm test
+
+# with coverage
+npm test -- --coverage
+```
+
 ### Productiono
 
 To execute in a production environment:
 
 ```bash
-/path/to/run.sh
+#!/usr/bin/env bash
+/path/to/alpaca-trading-scripts/.bin/run
 ```
