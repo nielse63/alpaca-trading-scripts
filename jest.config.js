@@ -34,6 +34,8 @@ module.exports = {
     '/__fixtures__/',
     '/__tests__/',
     '<rootDir>/src/types.d.ts',
+    '<rootDir>/src/alpaca-trading-script.ts',
+    '<rootDir>/src/index.ts',
   ],
 
   // Indicates which provider should be used to instrument code for coverage
@@ -127,7 +129,10 @@ module.exports = {
   // setupFiles: [],
 
   // A list of paths to modules that run some code to configure or set up the testing framework before each test
-  setupFilesAfterEnv: ['jest-extended/all'],
+  setupFilesAfterEnv: [
+    'jest-extended/all',
+    '<rootDir>/config/jestGlobalBefore.js',
+  ],
 
   // The number of seconds after which a test is considered as slow and reported as such in the results.
   // slowTestThreshold: 5,

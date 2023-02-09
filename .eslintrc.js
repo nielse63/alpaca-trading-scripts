@@ -47,7 +47,14 @@ module.exports = {
   },
   overrides: [
     {
-      files: ['.bin/**/*', '**/*.spec.{js,ts}', '*.d.ts'],
+      files: [
+        '.bin/**/*',
+        '**/*.spec.{js,ts}',
+        '*.d.ts',
+        '**/__mocks__/**',
+        '**/__tests__/**',
+        '**/__fixtures__/**',
+      ],
       rules: {
         'import/no-extraneous-dependencies': 'off',
         'no-underscore-dangle': 'off',

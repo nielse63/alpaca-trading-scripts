@@ -50,7 +50,7 @@ export const buy = async () => {
       type: 'market',
       time_in_force: 'day',
     });
-    console.log({ order });
+    console.log('buy', order);
   }
 };
 
