@@ -1,6 +1,7 @@
 !.*.js
 !.bin/
 package-lock.json
-coverage
-tmp
-logs
+**/coverage/**
+**/tmp/**
+**/logs/**
+**/dist/**
