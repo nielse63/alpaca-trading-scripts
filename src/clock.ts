@@ -1,4 +1,4 @@
-import findLastIndex from 'lodash/findLastIndex';
+import findLastIndex from 'lodash.findlastindex';
 import moment from 'moment';
 import { IDateObject } from './types';
 import { LOOKBACK_LIMIT, cache } from './constants';
