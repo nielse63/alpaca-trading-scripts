@@ -3,4 +3,3 @@
 
 npx lint-staged
 .bin/copy-env
-git add .env.sample
