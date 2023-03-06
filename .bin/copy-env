@@ -1,6 +1,18 @@
 #!/usr/bin/env node
 const fs = require('fs-extra');
 const path = require('path');
+const cp = require('child_process');
+
+const exec = (cmd) => {
+  return new Promise((resolve, reject) => {
+    cp.exec(cmd, (error, stdout, stderr) => {
+      if (error) {
+        return reject(new Error(stderr));
+      }
+      resolve(stdout);
+    });
+  });
+};
 
 const copyEnv = async () => {
   const envfile = path.resolve(__dirname, '../.env');
@@ -11,6 +23,7 @@ const copyEnv = async () => {
     process.exit();
   }
 
+  const oldContent = await fs.readFile(samplefile, 'utf-8');
   const content = await fs.readFile(envfile, 'utf-8');
   const lines = content.split('\n');
   const newLines = lines
@@ -27,9 +40,12 @@ const copyEnv = async () => {
       }
       return `${key.trim()}=${newValue.trim()}`;
     });
-  const sampleContent = newLines.join('\n');
-  await fs.writeFile(samplefile, sampleContent);
-  console.log('updated .env.sample');
+  const newContent = newLines.join('\n');
+  if (oldContent !== newContent) {
+    await fs.writeFile(samplefile, newContent);
+    await exec('git add .env.sample');
+    console.log('updated .env.sample');
+  }
 };
 
 copyEnv().catch(console.error);

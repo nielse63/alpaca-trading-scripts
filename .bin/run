@@ -16,4 +16,4 @@ if ! [ -d "$root/dist" ]; then
   npm run build
 fi
 
-npm start
+node dist/index.js
