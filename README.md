@@ -1,5 +1,9 @@
 # alpaca-trading-scripts
 
+> Description
+
+[Learn how to create your first algotrading bot on Medium.](https://medium.com/@ErikKyleNielsen/write-your-first-typescript-algotrading-bot-8194dfe60e5f)
+
 ## Installation
 
 ```bash
@@ -31,7 +35,7 @@ npm test
 npm test -- --coverage
 ```
 
-### Productiono
+### Running in production
 
 To execute in a production environment:
 
@@ -40,7 +44,7 @@ To execute in a production environment:
 /path/to/alpaca-trading-scripts/.bin/run
 ```
 
-### Relesaing
+### Creating a new release
 
 ```bash
 gh release create
