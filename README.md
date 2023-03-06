@@ -1,6 +1,6 @@
 # alpaca-trading-scripts
 
-> Description
+> Algotrading bot example using TypeScript
 
 [Learn how to create your first algotrading bot on Medium.](https://medium.com/@ErikKyleNielsen/write-your-first-typescript-algotrading-bot-8194dfe60e5f)
 
