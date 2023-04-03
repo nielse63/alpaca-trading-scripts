@@ -39,7 +39,7 @@
     "dotenv": "^16.0.3",
     "lodash.findlastindex": "^4.6.0",
     "moment": "^2.29.4",
-    "trading-signals": "^3.6.1"
+    "trading-signals": "^3.7.0"
   },
   "devDependencies": {
     "@babel/core": "^7.21.4",
