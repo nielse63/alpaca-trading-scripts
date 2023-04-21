@@ -35,7 +35,7 @@
     "npm": ">=8"
   },
   "dependencies": {
-    "@alpacahq/alpaca-trade-api": "^2.16.1",
+    "@alpacahq/alpaca-trade-api": "^3.0.0",
     "dotenv": "^16.0.3",
     "lodash.findlastindex": "^4.6.0",
     "moment": "^2.29.4",
