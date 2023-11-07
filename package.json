@@ -45,7 +45,7 @@
     "@babel/core": "^7.23.2",
     "@babel/preset-env": "^7.23.2",
     "@babel/preset-typescript": "^7.23.2",
-    "@types/fs-extra": "^11.0.3",
+    "@types/fs-extra": "^11.0.4",
     "@types/jest": "^29.5.7",
     "@types/lodash.findlastindex": "^4.6.8",
     "@types/moment-business": "^0.1.5",
