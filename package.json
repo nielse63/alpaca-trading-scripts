@@ -36,7 +36,7 @@
   },
   "dependencies": {
     "@alpacahq/alpaca-trade-api": "^3.0.1",
-    "dotenv": "^16.3.1",
+    "dotenv": "^16.4.3",
     "lodash.findlastindex": "^4.6.0",
     "moment": "^2.29.4",
     "trading-signals": "^3.7.0"
