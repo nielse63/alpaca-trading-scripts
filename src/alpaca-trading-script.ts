@@ -1,10 +1,11 @@
+import moment from 'moment';
 import { getAccount, getBuyingPower } from './account';
 import { getIsMarketOpen } from './clock';
 import { buy, sell } from './order';
 import { getPositions } from './position';
 
 const alpacaTradingScript = async () => {
-  console.log('[info] running at', new Date().toISOString());
+  console.log('[info] running at', moment().format('YYYY-MM-DD HH:mm:ss'));
   // make sure the market is open
   console.log('[info] checking if market is open');
   const isMarketOpen = await getIsMarketOpen();
