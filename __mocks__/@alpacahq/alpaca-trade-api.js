@@ -80,6 +80,10 @@ class Alpaca {
     });
   }
 
+  async cancelAllOrders() {
+    return [];
+  }
+
   async getOrder(orderId) {
     return {
       id: orderId,
