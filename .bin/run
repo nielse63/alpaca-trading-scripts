@@ -14,8 +14,6 @@ cd "$root"
 if ! [ -d "$root/node_modules" ]; then
   npm ci
 fi
-if ! [ -d "$root/dist" ]; then
-  npm run build
-fi
+npm run build
 
 node dist/index.js

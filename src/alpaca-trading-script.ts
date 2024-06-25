@@ -4,18 +4,18 @@ import { buy, sell } from './order';
 import { getPositions } from './position';
 
 const alpacaTradingScript = async () => {
-  console.log('running at', new Date().toISOString());
+  console.log('[info] running at', new Date().toISOString());
   // make sure the market is open
-  console.log('checking if market is open');
+  console.log('[info] checking if market is open');
   const isMarketOpen = await getIsMarketOpen();
   if (!isMarketOpen) {
-    console.warn('market is not open - exiting');
+    console.log('[info] [warning] market is not open - exiting');
     return;
   }
-  console.log('market is open!');
+  console.log('[info] market is open!');
 
   // get account data
-  console.log('getting account data');
+  console.log('[info] getting account data');
   const account = await getAccount();
   const { status } = account;
   if (status !== 'ACTIVE') {
@@ -24,18 +24,18 @@ const alpacaTradingScript = async () => {
   }
 
   // get positions
-  console.log('getting positions');
+  console.log('[info] getting positions');
   const positions = await getPositions();
 
   // if we have open positions, determine if they should be sold
   if (positions.length) {
-    console.log('running sell function');
+    console.log('[info] running sell function');
     await sell();
   }
   // if we have more than $1, see what (and if) we can buy
   const buyingPower = await getBuyingPower();
   if (buyingPower > 1) {
-    console.log('running buy function');
+    console.log('[info] running buy function');
     await buy();
   }
 };

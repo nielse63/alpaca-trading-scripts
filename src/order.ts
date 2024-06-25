@@ -49,7 +49,7 @@ export const buy = async () => {
       type: 'market',
       time_in_force: 'day',
     });
-    console.log('buy', order);
+    console.log('[info] buy', order);
   }
 };
 

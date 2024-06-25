@@ -44,7 +44,7 @@ const copyEnv = async () => {
   if (oldContent !== newContent) {
     await fs.writeFile(samplefile, newContent);
     await exec('git add .env.sample');
-    console.log('updated .env.sample');
+    console.log('[info] updated .env.sample');
   }
 };
 
