@@ -1,6 +1,6 @@
-import { cache, SYMBOL } from './constants';
 import alpaca from './alpaca';
-import { AlpacaPosition } from './types';
+import { cache, SYMBOL } from './constants';
+import { AlpacaPosition } from './types.d';
 
 export const getPositions = async () => {
   if (!cache.positions || !cache.positions.length) {

@@ -1,10 +1,11 @@
-import { ICacheObject } from './types';
+import { ICacheObject } from './types.d';
 
-export const PAPER_URL = 'https://paper-api.alpaca.markets';
-export const SYMBOL = 'MSFT';
-export const SMA_FAST_INTERVAL = 7;
-export const SMA_SLOW_INTERVAL = 14;
-export const LOOKBACK_LIMIT = 50;
+export const PAPER_URL = 'https://paper-api.alpaca.markets/v2';
+export const SYMBOL = 'BAC';
+export const SMA_FAST_INTERVAL = 11;
+export const SMA_SLOW_INTERVAL = 26;
+export const LOOKBACK_LIMIT = SMA_SLOW_INTERVAL * 2;
+export const TIME_INTERVAL = '1Hour';
 export const cache: ICacheObject = {
   alpaca: null,
   account: {

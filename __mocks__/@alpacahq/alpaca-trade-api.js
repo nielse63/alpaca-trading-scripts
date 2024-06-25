@@ -79,6 +79,52 @@ class Alpaca {
       resolve(mockPositions);
     });
   }
+
+  async getOrder(orderId) {
+    return {
+      id: orderId,
+      status: 'filled',
+    };
+  }
+
+  async createOrder(order) {
+    return {
+      id: '62d63c55-d3b8-4b97-91c9-719710c675dd',
+      client_order_id: 'f8f53b80-389f-43e0-a948-b9e3df694f8f',
+      created_at: '2023-02-06T22:05:40.640649Z',
+      updated_at: '2023-02-06T22:05:40.640649Z',
+      submitted_at: '2023-02-06T22:05:40.640165Z',
+      filled_at: null,
+      expired_at: null,
+      canceled_at: null,
+      failed_at: null,
+      replaced_at: null,
+      replaced_by: null,
+      replaces: null,
+      asset_id: 'b6d1aa75-5c9c-4353-a305-9e2caa1925ab',
+      symbol: order.symbol,
+      asset_class: 'us_equity',
+      notional: order?.notional || null,
+      qty: order?.qty || null,
+      filled_qty: '0',
+      filled_avg_price: null,
+      order_class: '',
+      order_type: 'market',
+      type: 'market',
+      side: order.side,
+      time_in_force: order.time_in_force,
+      limit_price: null,
+      stop_price: null,
+      status: 'accepted',
+      extended_hours: false,
+      legs: null,
+      trail_percent: null,
+      trail_price: null,
+      hwm: null,
+      subtag: null,
+      source: null,
+    };
+  }
 }
 
 export default Alpaca;

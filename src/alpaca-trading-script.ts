@@ -1,9 +1,10 @@
-import { getIsMarketOpen } from './clock';
 import { getAccount, getBuyingPower } from './account';
+import { getIsMarketOpen } from './clock';
 import { buy, sell } from './order';
 import { getPositions } from './position';
 
 const alpacaTradingScript = async () => {
+  console.log('running at', new Date().toISOString());
   // make sure the market is open
   console.log('checking if market is open');
   const isMarketOpen = await getIsMarketOpen();

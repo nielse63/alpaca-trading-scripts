@@ -1,6 +1,6 @@
-import { isNumeric, parseResponseObject } from '../helpers';
 import MockAccount from '../__fixtures__/account';
-import { AlpacaAccount } from '../types';
+import { isNumeric, parseResponseObject } from '../helpers';
+import { AlpacaAccount } from '../types.d';
 
 describe('helpers', () => {
   describe('isNumeric', () => {

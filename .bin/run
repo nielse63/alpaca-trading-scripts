@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 set -e
 
-root=$(dirname $(dirname "$0"))
+rm -f "/tmp/local.alpaca.*"
+
+root=$(dirname "$(dirname "$0")")
 if ! [ -d "$root" ]; then
   echo "value of \$root is not a directory - exiting"
   exit 1

@@ -12,12 +12,14 @@
   },
   "scripts": {
     "test": "jest",
-    "prepare": "husky install",
+    "prepare": "husky || true",
     "start": ".bin/run",
     "dev": "ts-node src/index.ts",
     "lint": "eslint --fix ./src && prettier --write ./src",
     "prebuild": "rm -rf dist/",
-    "build": "tsc"
+    "build": "tsc",
+    "prewatch": "npm run build",
+    "watch": "tsc -w"
   },
   "repository": {
     "type": "git",
@@ -31,15 +33,14 @@
   },
   "homepage": "https://github.com/nielse63/alpaca-trading-scripts#readme",
   "engines": {
-    "node": ">=16.20.2",
-    "npm": ">=8"
+    "node": ">=22.2.0"
   },
   "dependencies": {
     "@alpacahq/alpaca-trade-api": "^3.0.1",
     "dotenv": "^16.4.5",
     "lodash.findlastindex": "^4.6.0",
     "moment": "^2.30.1",
-    "trading-signals": "^3.7.0"
+    "trading-signals": "3.7.0"
   },
   "devDependencies": {
     "@babel/core": "^7.24.7",

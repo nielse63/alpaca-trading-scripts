@@ -1,9 +1,8 @@
-import { SYMBOL } from './constants';
-import alpaca from './alpaca';
 import { getBuyingPower } from './account';
+import alpaca from './alpaca';
 import { getLastBar } from './bars';
+import { SYMBOL } from './constants';
 import { getPositions } from './position';
-// import MockQuote from './__fixtures__/quote';
 
 export const waitForOrderFill = (orderId: string) =>
   new Promise((resolve, reject) => {
@@ -22,14 +21,14 @@ export const waitForOrderFill = (orderId: string) =>
   });
 
 export const getShouldBuy = async () => {
-  const buyingPower = await getBuyingPower();
+  // const buyingPower = await getBuyingPower();
 
   // true if sma_fast > sma_slow
-  const { sma } = await getLastBar();
-  const output = buyingPower > 1 && sma.fast > sma.slow;
-  console.log(
-    `should buy: ${output} (buyingPower = ${buyingPower}; sma.fast = ${sma.fast}; sma.slow = ${sma.slow})`
-  );
+  const { ema } = await getLastBar();
+  const output = ema.fast > ema.slow;
+  // console.log(
+  //   `should buy: ${output} (buyingPower = ${buyingPower}; ema.fast = ${ema.fast}; ema.slow = ${ema.slow})`
+  // );
   return output;
 };
 
@@ -56,10 +55,10 @@ export const buy = async () => {
 
 export const getShouldSell = async () => {
   const positions = await getPositions();
-  const { sma } = await getLastBar();
-  const output = positions.length && sma.fast < sma.slow;
+  const { ema } = await getLastBar();
+  const output = Boolean(positions.length && ema.fast < ema.slow);
   console.log(
-    `should sell: ${output} (positions.length = ${positions.length}; sma.fast = ${sma.fast}; sma.slow = ${sma.slow})`
+    `should sell: ${output} (positions.length = ${positions.length}; ema.fast = ${ema.fast}; ema.slow = ${ema.slow})`
   );
   return output;
 };

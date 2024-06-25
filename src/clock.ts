@@ -1,8 +1,8 @@
 import findLastIndex from 'lodash.findlastindex';
 import moment from 'moment';
-import { IDateObject } from './types';
-import { LOOKBACK_LIMIT, cache } from './constants';
 import alpaca from './alpaca';
+import { LOOKBACK_LIMIT, cache } from './constants';
+import { IDateObject } from './types.d';
 
 export const getIsMarketOpen = async () => {
   if (!('isMarketOpen' in cache)) {

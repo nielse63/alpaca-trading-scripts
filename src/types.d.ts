@@ -1,9 +1,9 @@
+import Alpaca from '@alpacahq/alpaca-trade-api';
 import {
+  AlpacaBar,
   AlpacaQuote,
   AlpacaTrade,
-  AlpacaBar,
 } from '@alpacahq/alpaca-trade-api/dist/resources/datav2/entityv2';
-import Alpaca from '@alpacahq/alpaca-trade-api';
 
 export interface IDateObject {
   date: string;
@@ -52,7 +52,7 @@ export type AlpacaAccount = {
 };
 
 export type BarSMA = {
-  sma: {
+  ema: {
     fast: number;
     slow: number;
   };
@@ -76,4 +76,4 @@ export interface ICacheObject {
   positions: AlpacaPosition[];
 }
 
-export { IBar, AlpacaBar, AlpacaQuote, AlpacaTrade };
+export { AlpacaBar, AlpacaQuote, AlpacaTrade, IBar };
