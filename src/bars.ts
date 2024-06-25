@@ -5,8 +5,8 @@ import {
   SMA_FAST_INTERVAL,
   SMA_SLOW_INTERVAL,
   SYMBOL,
-  cache,
   TIME_INTERVAL,
+  cache,
 } from './constants';
 import { generatorToArray } from './helpers';
 import { AlpacaBar } from './types.d';
@@ -53,4 +53,9 @@ export const getBars = async () => {
 export const getLastBar = async () => {
   const bars = await getBars();
   return bars[bars.length - 1];
+};
+
+export const getCurrentPrice = async () => {
+  const response = await alpaca.getLatestBar(SYMBOL);
+  return response.ClosePrice;
 };
