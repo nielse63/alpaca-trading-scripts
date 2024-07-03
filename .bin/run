@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-rm -f "/tmp/local.alpaca.*"
-rm -f "*.log"
+rm -f /tmp/local.alpaca.*
 
 root=$(dirname "$(dirname "$0")")
 if ! [ -d "$root" ]; then
@@ -12,6 +11,7 @@ fi
 
 cd "$root"
 
+rm -f ./*.log
 if ! [ -d "$root/node_modules" ]; then
   npm ci
 fi
