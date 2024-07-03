@@ -2,22 +2,23 @@ import { getBuyingPower } from './account';
 import alpaca from './alpaca';
 import { getCurrentPrice, getLastBar } from './bars';
 import { SYMBOL, TRAILING_STOP_LOSS_PERCENT } from './constants';
+import { log } from './helpers';
 import { getPositions } from './position';
 
 export const waitForOrderFill = (orderId: string) =>
   new Promise((resolve, reject) => {
-    console.log(`[info] waiting for order ${orderId} to fill`);
+    log(`[info] waiting for order ${orderId} to fill`);
     const getBuyOrderInterval = setInterval(async () => {
       try {
         const buyOrder = await alpaca.getOrder(orderId);
-        console.log(`[info] order ${orderId} status: ${buyOrder.status}`);
+        log(`[info] order ${orderId} status: ${buyOrder.status}`);
         if (buyOrder.status === 'filled') {
           clearInterval(getBuyOrderInterval);
           resolve(buyOrder);
         }
-      } catch (error) {
+      } catch (e) {
         clearInterval(getBuyOrderInterval);
-        reject(error);
+        reject(e);
       }
     }, 1000);
   });
@@ -28,7 +29,7 @@ export const getShouldBuy = async () => {
   // true if sma_fast > sma_slow
   const { ema } = await getLastBar();
   const output = ema.fast > ema.slow;
-  console.log(
+  log(
     `should buy: ${output} (buyingPower = ${buyingPower}; ema.fast = ${ema.fast}; ema.slow = ${ema.slow})`
   );
   return true;
@@ -45,11 +46,11 @@ export const buy = async () => {
     const currentPrice = await getCurrentPrice();
     const qty = Math.floor(buyingPower / currentPrice);
     if (qty < 1) {
-      console.log('[info] not enough buying power');
+      log('[info] not enough buying power');
       return;
     }
 
-    console.log('[info] buying', qty, 'of', SYMBOL, 'at', currentPrice);
+    log('[info] buying', qty, 'of', SYMBOL, 'at', currentPrice);
     const buyOrder = await alpaca.createOrder({
       symbol: SYMBOL,
       qty: qty,
@@ -57,7 +58,7 @@ export const buy = async () => {
       type: 'market',
       time_in_force: 'day',
     });
-    console.log('[info] buy order:', buyOrder);
+    log('[info] buy order:', buyOrder);
     await waitForOrderFill(buyOrder.id);
     const tslOrder = await alpaca.createOrder({
       symbol: SYMBOL,
@@ -67,7 +68,7 @@ export const buy = async () => {
       trail_percent: TRAILING_STOP_LOSS_PERCENT,
       time_in_force: 'gtc',
     });
-    console.log('[info] trailing stop loss order:', tslOrder);
+    log('[info] trailing stop loss order:', tslOrder);
   }
 };
 
@@ -75,7 +76,7 @@ export const getShouldSell = async () => {
   const positions = await getPositions();
   const { ema } = await getLastBar();
   const output = Boolean(positions.length && ema.fast < ema.slow);
-  console.log(
+  log(
     `should sell: ${output} (positions.length = ${positions.length}; ema.fast = ${ema.fast}; ema.slow = ${ema.slow})`
   );
   return output;

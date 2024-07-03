@@ -2,6 +2,7 @@
 set -e
 
 rm -f "/tmp/local.alpaca.*"
+rm -f "*.log"
 
 root=$(dirname "$(dirname "$0")")
 if ! [ -d "$root" ]; then

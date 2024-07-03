@@ -1,3 +1,5 @@
+const logToFile = require('log-to-file');
+
 export const isNumeric = (value: unknown) => {
   if (typeof value != 'string') return false;
   return !isNaN(Number(value)) && !isNaN(parseFloat(value));
@@ -25,4 +27,14 @@ export const generatorToArray = async (resp: AsyncGenerator): Promise<any> => {
     result.push(x);
   }
   return result;
+};
+
+export const log = (message?: any, ...optionalParams: any[]): void => {
+  console.log(message, ...optionalParams);
+  logToFile(message, 'stdout.log');
+};
+
+export const error = (message?: any, ...optionalParams: any[]): void => {
+  console.error(message, ...optionalParams);
+  logToFile(message, 'stderr.log');
 };
