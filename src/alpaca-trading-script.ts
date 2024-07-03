@@ -1,9 +1,9 @@
 import moment from 'moment';
 import { getAccount, getBuyingPower } from './account';
 import { getIsMarketOpen } from './clock';
+import { error, log } from './helpers';
 import { buy, sell } from './order';
 import { getPositions } from './position';
-import { log, error } from './helpers';
 
 const alpacaTradingScript = async () => {
   log('[info] running at', moment().format('YYYY-MM-DD HH:mm:ss'));
