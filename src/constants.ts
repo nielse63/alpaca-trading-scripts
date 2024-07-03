@@ -4,9 +4,9 @@ export const PAPER_URL = 'https://paper-api.alpaca.markets/v2';
 export const SYMBOL = 'BAC';
 export const SMA_FAST_INTERVAL = 11;
 export const SMA_SLOW_INTERVAL = 23;
-export const LOOKBACK_LIMIT = SMA_SLOW_INTERVAL * 2;
+export const LOOKBACK_LIMIT = SMA_SLOW_INTERVAL * 3;
 export const TIME_INTERVAL = '1Hour';
-export const STOP_LOSS_PERCENT = 0.985;
+export const STOP_LOSS_PERCENT = 0.99;
 export const TRAILING_STOP_LOSS_PERCENT = 1.5;
 export const cache: ICacheObject = {
   alpaca: null,
