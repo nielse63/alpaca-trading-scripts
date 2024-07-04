@@ -1,0 +1,48 @@
+// This Pine Script™ code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © eriknielsen312
+
+//@version=5
+strategy("EMA Crossover", overlay = true, pyramiding = 1, initial_capital = 10000, default_qty_type = strategy.percent_of_equity, default_qty_value = 100)
+
+// Calculate two moving averages with different lengths.
+int fastLength = input.int(11)
+int slowLength = input.int(26)
+float stopLossOffset = input.float(1 , title = "stop loss %", minval= 0)
+float fastMA = ta.ema(close, fastLength)
+float slowMA = ta.ema(close, slowLength)
+
+var float stopLoss = na
+var color stopLossColor = na
+var float stopLossPerc = na
+
+// Enter a long position when `fastMA` crosses over `slowMA`.
+if ta.crossover(fastMA, slowMA)
+    if strategy.position_size < 0
+        strategy.close_all('close short')
+        stopLoss := na
+    strategy.entry(id = "long", direction = strategy.long, limit = close)
+    stopLossPerc := (100 - stopLossOffset) / 100
+    stopLoss := close * stopLossPerc
+    stopLossColor := color.red
+if ta.crossunder(fastMA, slowMA)
+    if strategy.position_size > 0
+        strategy.close_all('close long')
+        stopLoss := na
+    strategy.entry(id = 'short', direction = strategy.short, limit = close)
+    stopLossPerc := (100 + stopLossOffset) / 100
+    stopLoss := close * stopLossPerc
+    stopLossColor := color.green
+if strategy.position_size == 0
+    stopLossPerc := na
+    stopLoss := na
+    stopLossColor := na
+if not na(stopLoss) and strategy.position_size > 0 and close < stopLoss
+    strategy.close_all('stop loss long')
+if not na(stopLoss) and strategy.position_size < 0 and close > stopLoss
+    strategy.close_all('stop loss short')
+
+
+// Plot the moving averages.
+plot(fastMA, "fast ma", color.aqua)
+plot(slowMA, "slow ma", color.orange)
+plot(na(stopLoss) ? na : stopLoss, color = stopLossColor, title="stop loss", style = plot.style_circles, linewidth = 2)

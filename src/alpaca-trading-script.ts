@@ -12,13 +12,14 @@ const alpacaTradingScript = async () => {
   const isMarketOpen = await getIsMarketOpen();
   if (!isMarketOpen) {
     log('[warning] market is not open - exiting');
-    return;
+    // return;
   }
   log('[info] market is open!');
 
   // get account data
   log('[info] getting account data');
   const account = await getAccount();
+  console.log('account', account);
   const { status } = account;
   if (status !== 'ACTIVE') {
     error('account is not active - exiting');
@@ -28,6 +29,7 @@ const alpacaTradingScript = async () => {
   // get positions
   log('[info] getting positions');
   const positions = await getPositions();
+  console.log('positions', positions);
 
   // if we have open positions, determine if they should be sold
   if (positions.length) {

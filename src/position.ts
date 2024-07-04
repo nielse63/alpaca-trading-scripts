@@ -11,3 +11,23 @@ export const getPositions = async () => {
   }
   return cache.positions;
 };
+
+export const hasLongPosition = async () => {
+  const positions = await getPositions();
+  if (!positions.length) {
+    return false;
+  }
+  return positions.some((position: AlpacaPosition) => {
+    return position.side === 'long';
+  });
+};
+
+export const hasShortPosition = async () => {
+  const positions = await getPositions();
+  if (!positions.length) {
+    return false;
+  }
+  return positions.some((position: AlpacaPosition) => {
+    return position.side === 'short';
+  });
+};
