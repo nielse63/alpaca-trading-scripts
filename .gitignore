@@ -134,3 +134,4 @@ tmp/*
 data/*
 !data/.gitkeep
 .vscode
+backtest.json

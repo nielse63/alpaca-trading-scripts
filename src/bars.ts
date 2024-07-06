@@ -11,13 +11,13 @@ import {
 import { generatorToArray } from './helpers';
 import { AlpacaBar } from './types.d';
 
-export const getBars = async () => {
+export const getBars = async (symbol?: string) => {
   if (cache.bars && cache.bars.length) {
     return cache.bars;
   }
 
   const pastTradingDays = await getTradingDates();
-  const response = alpaca.getBarsV2(SYMBOL, {
+  const response = alpaca.getBarsV2(symbol || SYMBOL, {
     start: pastTradingDays.shift().date,
     end: pastTradingDays.pop().date,
     timeframe: TIME_INTERVAL,
