@@ -232,7 +232,7 @@ async function placeOrder(data: BarObjectWithSignals[]) {
   const capital = await getBuyingPower();
   log(`current capital: ${capital}`);
   const lastBar = data[data.length - 1];
-  // log(`last bar: ${JSON.stringify(lastBar, null, 2)}`);
+  log(`last bar: ${JSON.stringify(lastBar, null, 2)}`);
   // buy signal
   if (lastBar.signal === 1) {
     const qty = Math.floor(capital / lastBar.close);
@@ -297,5 +297,7 @@ const crypto = async () => {
     log(`Error placing order: ${error}`);
   }
 };
+
+// crypto().catch(console.error);
 
 export default crypto;
