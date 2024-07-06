@@ -37,10 +37,13 @@
   },
   "dependencies": {
     "@alpacahq/alpaca-trade-api": "^3.1.0",
+    "date-fns": "^3.6.0",
     "dotenv": "^16.4.5",
     "lodash.findlastindex": "^4.6.0",
     "log-to-file": "^3.0.3",
     "moment": "^2.30.1",
+    "node-cron": "^3.0.3",
+    "technicalindicators": "^3.1.0",
     "trading-signals": "3.7.0"
   },
   "devDependencies": {
@@ -52,6 +55,7 @@
     "@types/lodash.findlastindex": "^4.6.9",
     "@types/moment-business": "^0.1.6",
     "@types/node": "^20.14.9",
+    "@types/node-cron": "^3.0.11",
     "@typescript-eslint/eslint-plugin": "^7.15.0",
     "@typescript-eslint/parser": "^7.15.0",
     "babel-jest": "^29.7.0",
