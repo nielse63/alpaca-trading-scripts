@@ -20,7 +20,8 @@
     "build": "tsc",
     "prewatch": "npm run build",
     "watch": "tsc -w",
-    "cron": "node dist/crypto/cron.js"
+    "cron": "node dist/crypto/cron.js",
+    "crypto:backtest": "node dist/crypto/backtest.js"
   },
   "repository": {
     "type": "git",

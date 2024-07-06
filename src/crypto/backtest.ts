@@ -1,11 +1,12 @@
-import fs from 'fs';
-import path from 'path';
-import { log } from '../helpers';
+// import fs from 'fs';
+// import path from 'path';
+// import { log } from '../helpers';
 import {
   calculateIndicators,
   fetchHistoricalData,
   generateSignals,
-  CRYPTO_SYMBOL,
+  // CRYPTO_SYMBOL,
+  CRYPTO_UNIVERSE,
 } from './helpers';
 
 type BarObject = {
@@ -115,36 +116,52 @@ async function backtest(data: BarObjectWithSignals[]) {
       }
       positionObject = { ...defaultPositionObject };
     }
-
-    // return { ...d, capital };
   });
 
   return {
     ...output,
     positions,
+    initialCapital,
     profitPerc: parseFloat(((output.profit / initialCapital) * 100).toFixed(2)),
     winRate: parseFloat(((wins / (wins + losses)) * 100).toFixed(2)),
   };
 }
 
-const main = async () => {
-  const data = await fetchHistoricalData(CRYPTO_SYMBOL);
+const backtestForSymbol = async (symbol: string) => {
+  const data = await fetchHistoricalData(symbol);
   const dataWithIndicators = calculateIndicators(data);
   const dataWithSignals = generateSignals(dataWithIndicators);
   const results = await backtest(dataWithSignals);
-  log(
-    `results of backtest: ${JSON.stringify(
-      {
-        winRate: results.winRate,
-        profit: parseFloat(results.profit.toFixed(2)),
-        profitPerc: parseFloat(results.profitPerc.toFixed(2)),
-      },
-      null,
-      2
-    )}`
+  const output = {
+    initialCapital: results.initialCapital,
+    winRate: results.winRate,
+    profit: parseFloat(results.profit.toFixed(2)),
+    profitPerc: parseFloat(results.profitPerc.toFixed(2)),
+  };
+  console.log(
+    `results of backtest for ${symbol}: ${JSON.stringify(output, null, 2)}`
   );
-  const filepath = path.resolve(__dirname, '../../backtest.json');
-  fs.writeFileSync(filepath, JSON.stringify(results, null, 2));
+  return {
+    symbol,
+    ...output,
+  };
+  // const filepath = path.resolve(__dirname, '../../backtest.json');
+  // fs.writeFileSync(filepath, JSON.stringify(results, null, 2));
 };
 
-main().catch(console.error);
+const backtestUniverses = async () => {
+  let highestProfitPerc = 0;
+  let bestPerformingSymbol = '';
+  let bestResults = {};
+  for (const symbol of CRYPTO_UNIVERSE) {
+    const results = await backtestForSymbol(symbol);
+    if (results.profitPerc > highestProfitPerc) {
+      bestResults = results;
+      highestProfitPerc = results.profitPerc;
+      bestPerformingSymbol = symbol;
+    }
+  }
+  console.log('best performing symbol:', bestPerformingSymbol, bestResults);
+};
+
+backtestUniverses().catch(console.error);

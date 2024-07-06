@@ -1,4 +1,4 @@
-import { format, subWeeks } from 'date-fns';
+import { subWeeks } from 'date-fns';
 import { EMA, MACD, RSI } from 'technicalindicators';
 import alpaca from '../alpaca';
 
@@ -24,8 +24,10 @@ type BarObject = {
 type BarObjectWithIndicators = BarObject & {
   ema9: number | null;
   ema21: number | null;
+  emaGap: number | null;
   macd: number | null | undefined;
   macdSignal: number | null | undefined;
+  macdGap: number | null | undefined;
   rsi: number | null;
 };
 
@@ -33,11 +35,33 @@ type BarObjectWithSignals = BarObjectWithIndicators & {
   signal: number;
 };
 
-export const CRYPTO_SYMBOL = 'AVAX/USD';
+export const CRYPTO_SYMBOL = 'AAVE/USD';
+export const CRYPTO_UNIVERSE = [
+  'AAVE',
+  'AVAX',
+  'BAT',
+  'BCH',
+  'BTC',
+  'CRV',
+  'DOGE',
+  'DOT',
+  'ETH',
+  'GRT',
+  'LINK',
+  'LTC',
+  'MKR',
+  'SHIB',
+  'SUSHI',
+  'UNI',
+  'USDC',
+  'USDT',
+  'XTZ',
+  'YFI',
+].map((s) => `${s}/USD`);
 
 export async function fetchHistoricalData(symbol: string) {
-  const end = format(new Date(), 'yyyy-MM-dd');
-  const start = format(subWeeks(end, 2), 'yyyy-MM-dd');
+  const end = new Date();
+  const start = subWeeks(end, 2).toISOString();
   const response: Map<string, AlpacaBarObject[]> = await alpaca.getCryptoBars(
     [symbol],
     {
@@ -57,7 +81,7 @@ export async function fetchHistoricalData(symbol: string) {
       timestamp: d.Timestamp,
     })
   );
-  return formattedData;
+  return formattedData.slice(-1000);
 }
 
 export function calculateIndicators(
@@ -65,9 +89,9 @@ export function calculateIndicators(
 ): BarObjectWithIndicators[] {
   const closePrices = data.map((d: BarObject) => d.close);
 
-  const ema9 = EMA.calculate({ period: 9, values: closePrices });
-  const ema21 = EMA.calculate({ period: 21, values: closePrices });
-  const macd = MACD.calculate({
+  const emaFast = EMA.calculate({ period: 9, values: closePrices });
+  const emaSlow = EMA.calculate({ period: 21, values: closePrices });
+  const macdData = MACD.calculate({
     values: closePrices,
     fastPeriod: 12,
     slowPeriod: 26,
@@ -78,14 +102,25 @@ export function calculateIndicators(
   const rsi = RSI.calculate({ period: 14, values: closePrices });
 
   return data
-    .map((d: BarObject, i: number) => ({
-      ...d,
-      ema9: ema9[i] || null,
-      ema21: ema21[i] || null,
-      macd: macd[i] ? macd[i].MACD : null,
-      macdSignal: macd[i] ? macd[i].signal : null,
-      rsi: rsi[i] || null,
-    }))
+    .map((d: BarObject, i: number) => {
+      const ema9 = emaFast[i] || null;
+      const ema21 = emaSlow[i] || null;
+      const emaGap = ema9 && ema21 ? Math.abs(ema9 - ema21) : null;
+      const macd = macdData[i] ? macdData[i].MACD : null;
+      const macdSignal = macdData[i] ? macdData[i].signal : null;
+      const macdGap = macd && macdSignal ? Math.abs(macdSignal - macd) : null;
+
+      return {
+        ...d,
+        ema9,
+        ema21,
+        emaGap,
+        macd,
+        macdSignal,
+        macdGap,
+        rsi: rsi[i] || null,
+      };
+    })
     .reverse();
 }
 
@@ -100,26 +135,39 @@ export function generateSignals(
     const prev = data[i - 1];
     let signal = 0;
 
+    const buySignal =
+      (signal !== 1 &&
+        d.ema9 > d.ema21 &&
+        // prev.ema9 !== null &&
+        // prev.ema21 !== null &&
+        // prev.ema9 <= prev.ema21 &&
+        d.macd > d.macdSignal &&
+        d.rsi < 70) ||
+      (signal !== 1 &&
+        prev.ema9 !== null &&
+        prev.ema21 !== null &&
+        d.ema9 > prev.ema9 &&
+        d.emaGap !== null &&
+        prev.emaGap !== null &&
+        d.emaGap < prev.emaGap &&
+        d.ema9 > d.ema21 &&
+        d.macd > d.macdSignal &&
+        d.rsi < 70);
+
     // buy signal
-    if (
-      d.ema9 > d.ema21 &&
-      prev.ema9 !== null &&
-      prev.ema21 !== null &&
-      prev.ema9 <= prev.ema21 &&
-      d.macd > d.macdSignal &&
-      d.rsi < 70
-    ) {
+    if (buySignal) {
       signal = 1;
 
       // sell signal
     } else if (
+      signal !== -1 &&
       d.ema9 < d.ema21 &&
       prev.ema9 !== null &&
       prev.ema21 !== null &&
       prev.ema9 >= prev.ema21 &&
       d.macd < d.macdSignal &&
-      d.rsi > 30 &&
-      d.rsi < 70
+      d.rsi > 30 /*&&
+      d.rsi < 70*/
     ) {
       signal = -1;
     }
