@@ -20,7 +20,7 @@
     "build": "tsc",
     "prewatch": "npm run build",
     "watch": "tsc -w",
-    "cron": "node dist/cron.js"
+    "cron": "node dist/crypto/cron.js"
   },
   "repository": {
     "type": "git",
