@@ -19,7 +19,8 @@
     "prebuild": "rm -rf dist/",
     "build": "tsc",
     "prewatch": "npm run build",
-    "watch": "tsc -w"
+    "watch": "tsc -w",
+    "cron": "node dist/cron.js"
   },
   "repository": {
     "type": "git",

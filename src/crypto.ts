@@ -1,4 +1,4 @@
-import { format, subMonths } from 'date-fns';
+import { format, subWeeks } from 'date-fns';
 import fs from 'fs';
 import path from 'path';
 import { EMA, MACD, RSI } from 'technicalindicators';
@@ -59,11 +59,12 @@ const CRYPTO_SYMBOL = 'AVAX/USD';
 
 async function fetchHistoricalData() {
   const end = format(new Date(), 'yyyy-MM-dd');
-  const start = format(subMonths(end, 1), 'yyyy-MM-dd');
+  // const start = format(subMonths(end, 1), 'yyyy-MM-dd');
+  const start = format(subWeeks(end, 2), 'yyyy-MM-dd');
   const response: Map<string, any> = await alpaca.getCryptoBars(
     [CRYPTO_SYMBOL],
     {
-      timeframe: '1Hour',
+      timeframe: '15Min',
       start,
       end,
       sort: 'desc',
@@ -148,7 +149,8 @@ function generateSignals(
 
 async function backtest(data: BarObjectWithSignals[]) {
   let position = 0; // 0: no position, 1+: long, -1-: short
-  const initialCapital = await getBuyingPower();
+  // const initialCapital = await getBuyingPower();
+  const initialCapital = 10000;
   let capital = initialCapital;
   let buyPrice = 0;
   const positions: PositionObject[] = [];
@@ -179,7 +181,7 @@ async function backtest(data: BarObjectWithSignals[]) {
 
     // buy signal
     if (d.signal === 1 && position === 0) {
-      const qty = Math.floor(capital / d.close);
+      const qty = parseFloat((capital / d.close).toFixed(0));
       positionObject = {
         ...positionObject,
         buyPrice: d.close,
@@ -235,7 +237,7 @@ async function placeOrder(data: BarObjectWithSignals[]) {
   log(`last bar: ${JSON.stringify(lastBar, null, 2)}`);
   // buy signal
   if (lastBar.signal === 1) {
-    const qty = Math.floor(capital / lastBar.close);
+    const qty = parseFloat((capital / lastBar.close).toFixed(0));
     log(`Placing buy order for ${qty} shares of ${CRYPTO_SYMBOL}`);
     if (qty > 0) {
       const buyOrder = await alpaca.createOrder({

@@ -2,8 +2,8 @@ import cron from 'node-cron';
 import crypto from './crypto';
 import { log } from './helpers';
 
-cron.schedule('0 * * * *', async () => {
+cron.schedule('*/15 * * * *', async () => {
   log('');
-  log(`Running a task every hour at ${new Date().toISOString()}`);
+  log(`executing crypto at ${new Date().toISOString()}`);
   await crypto();
 });
