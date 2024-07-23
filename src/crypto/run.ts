@@ -2,21 +2,18 @@ import fs from 'fs-extra';
 import { getBuyingPower } from '../account';
 import alpaca from '../alpaca';
 import { STDERR_LOG_FILE, STDOUT_LOG_FILE } from '../constants';
+import { CRYPTO_UNIVERSE } from './constants';
 import { error as errorLogger, log } from '../helpers';
 // import { waitForOrderFill } from '../order';
 import closePositions from './closePositions';
 import getCryptoPositions from './getCryptoPositions';
 import {
-  calculateIndicators,
-  CRYPTO_UNIVERSE,
-  fetchHistoricalData,
-  generateSignals,
-} from './helpers';
-import {
   AlpacaQuoteObject,
-  BarObjectWithSignals,
-  FetchedHistoricalDataObject,
+  // BarObjectWithSignals,
+  // FetchedHistoricalDataObject,
+  SignalsObjectType,
 } from './types.d';
+import { getBarsWithSignals } from './services';
 
 const run = async () => {
   // clear existing logs
@@ -41,27 +38,29 @@ const run = async () => {
       !closedPositions.includes(symbol) && !cryptoSymbols.includes(symbol)
   );
   const fetchPromises = symbolsToFetch.map((symbol) =>
-    fetchHistoricalData(symbol)
-      .then((data) => ({ data }))
-      .catch((error) => ({ error }))
+    getBarsWithSignals(symbol)
+      .then((data) => data)
+      .catch((error) => {
+        console.error(error);
+        errorLogger(error);
+      })
   );
-  const fetchedData = await Promise.all(fetchPromises);
+  const barsWithSignals: (SignalsObjectType | void)[] =
+    await Promise.all(fetchPromises);
 
   // filter and process data
-  const shouldBuy: BarObjectWithSignals[] = fetchedData.reduce(
-    (
-      acc: BarObjectWithSignals[],
-      { data = [], error = '' }: FetchedHistoricalDataObject
-    ) => {
-      if (error) return acc;
-      const lastClosePrice = data[data.length - 1].close;
+  const shouldBuy: SignalsObjectType[] = barsWithSignals.reduce(
+    (acc: SignalsObjectType[], object: SignalsObjectType | void) => {
+      if (!object) return acc;
+      const { signals, lastIndicators } = object;
+      const { close: lastClosePrice } = lastIndicators;
       if (lastClosePrice >= 2) {
-        const dataWithIndicators = calculateIndicators(data);
-        const dataWithSignals = generateSignals(dataWithIndicators);
-        const lastBar = dataWithSignals[data.length - 1];
+        // const dataWithIndicators = calculateIndicators(data);
+        // const dataWithSignals = generateSignals(dataWithIndicators);
+        // const lastBar = dataWithSignals[data.length - 1];
         // log(`${lastBar.symbol}:\n${JSON.stringify(dataWithSignals, null, 2)}`);
-        if (lastBar.signal > 0) {
-          acc.push(lastBar);
+        if (signals.buy) {
+          acc.push(object);
         }
       }
       return acc;
@@ -74,7 +73,8 @@ const run = async () => {
     return;
   }
 
-  log(`assets to buy: ${shouldBuy.map((b) => b.symbol).join(', ')}`);
+  const symbols = shouldBuy.map((b) => b.symbol);
+  log(`assets to buy: ${symbols.join(', ')}`);
 
   // prevent buying if we have no capital
   let availableCapital = await getBuyingPower();
@@ -85,13 +85,12 @@ const run = async () => {
   const amountPerPosition = availableCapital / shouldBuy.length;
 
   // get latest quotes
-  const symbols = shouldBuy.map((b) => b.symbol);
   const latestQuotes: Map<string, AlpacaQuoteObject> =
     await alpaca.getLatestCryptoQuotes(symbols);
 
   // buy assets
-  for (const lastBar of shouldBuy) {
-    const { symbol } = lastBar;
+  for (const object of shouldBuy) {
+    const { symbol } = object;
 
     // determine qty and cost basis
     const latestBidPrice = latestQuotes.has(symbol)
@@ -105,6 +104,7 @@ const run = async () => {
       costBasis = availableCapital;
       qty = parseFloat((costBasis / latestBidPrice).toFixed(4));
     }
+    console.log({ symbol, qty, costBasis });
 
     // prevent buying if cost basis is less than 1
     if (costBasis < 1) {

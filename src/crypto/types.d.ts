@@ -73,3 +73,33 @@ export type FetchedHistoricalDataObject = {
   data?: BarObject[];
   error?: string;
 };
+
+export type BarObjectWithIndicatorsNew = BarObject & {
+  emaFast: number | null;
+  emaSlow: number | null;
+  macdValue: number | null;
+  macdSignal: number | null;
+  macdHistogram: number | null;
+  rsi: number | null;
+};
+
+export type IndicatorsObjectType = {
+  symbol: string;
+  data: BarObjectWithIndicatorsNew[];
+  lastIndicators: {
+    emaFast: number;
+    emaSlow: number;
+    macdValue: number;
+    macdSignal: number;
+    macdHistogram: number;
+    rsi: number;
+    close: number;
+  };
+};
+
+export type SignalsObjectType = IndicatorsObjectType & {
+  signals: {
+    buy: boolean;
+    sell: boolean;
+  };
+};

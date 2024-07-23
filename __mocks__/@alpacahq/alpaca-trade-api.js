@@ -2,6 +2,7 @@ import moment from 'moment';
 import business from 'moment-business';
 import mockAccount from '../../src/__fixtures__/account';
 import mockBars from '../../src/__fixtures__/bars';
+import mockCryptoBars from '../../src/__fixtures__/cryptoBars';
 import mockPositions from '../../src/__fixtures__/positions';
 
 class Alpaca {
@@ -135,6 +136,14 @@ class Alpaca {
       message: 'Position is being liquidated',
       symbol,
     };
+  }
+
+  async getCryptoBars(symbols) {
+    const map = new Map();
+    for (let symbol of symbols) {
+      map.set(symbol, mockCryptoBars);
+    }
+    return Promise.resolve(map);
   }
 }
 
