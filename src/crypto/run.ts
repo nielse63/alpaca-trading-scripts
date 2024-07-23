@@ -110,6 +110,7 @@ const run = async () => {
     });
 
   // determine if we need to sell open positions
+  const closedPositions = [];
   for (const position of crypotPositions) {
     const { symbol } = position;
     const data = await fetchHistoricalData(symbol);
@@ -117,6 +118,7 @@ const run = async () => {
     const dataWithSignals = generateSignals(dataWithIndicators);
     const lastBar = dataWithSignals[data.length - 1];
     if (lastBar.signal === -1) {
+      closedPositions.push(symbol);
       log(`closing all posiitons for ${symbol}`);
       await alpaca.closePosition(symbol);
     }
@@ -125,6 +127,9 @@ const run = async () => {
   // determine what we can buy
   const shouldBuy = [];
   for (const symbol of CRYPTO_UNIVERSE) {
+    if (closedPositions.includes(symbol)) {
+      continue;
+    }
     const data = await fetchHistoricalData(symbol);
     const lastClosePrice = data[data.length - 1].close;
     if (lastClosePrice > 100) {
@@ -177,6 +182,6 @@ const run = async () => {
   }
 };
 
-run().catch(console.error);
+// run().catch(console.error);
 
 export default run;
