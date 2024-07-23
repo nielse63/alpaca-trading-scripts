@@ -124,13 +124,16 @@ const run = async () => {
 
   // determine what we can buy
   const shouldBuy = [];
-  const availableCapital = await getBuyingPower();
   for (const symbol of CRYPTO_UNIVERSE) {
     const data = await fetchHistoricalData(symbol);
+    const lastClosePrice = data[data.length - 1].close;
+    if (lastClosePrice > 100) {
+      continue;
+    }
     const dataWithIndicators = calculateIndicators(data);
     const dataWithSignals = generateSignals(dataWithIndicators);
     const lastBar = dataWithSignals[data.length - 1];
-    if (lastBar.signal === 1) {
+    if (lastBar.signal > 0) {
       shouldBuy.push({ ...lastBar, symbol });
     }
   }
@@ -143,6 +146,7 @@ const run = async () => {
   shouldBuy.forEach((b) => {
     log(`- ${b.symbol}`);
   });
+  const availableCapital = await getBuyingPower();
   const amountPerPosition = availableCapital / shouldBuy.length;
   for (const lastBar of shouldBuy) {
     const { symbol } = lastBar;
@@ -173,6 +177,6 @@ const run = async () => {
   }
 };
 
-// run().catch(console.error);
+run().catch(console.error);
 
 export default run;
