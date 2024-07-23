@@ -18,3 +18,58 @@ export type AlpacaPosition = {
   change_today: string;
   qty_available: string;
 };
+
+export type AlpacaBarObject = {
+  Close: number;
+  High: number;
+  Low: number;
+  TradeCount: number;
+  Open: number;
+  Timestamp: string;
+  Volume: number;
+  VWAP: number;
+};
+
+export type AlpacaQuoteObject = {
+  AskPrice: number;
+  AskSize: number;
+  BidPrice: number;
+  BidSize: number;
+  Timestamp: string;
+};
+
+export type AlpacaCryptoBarsConfig = {
+  timeframe: string;
+  sort: string;
+  limit: number;
+  page_token?: string;
+};
+
+export type BarObject = {
+  close: number;
+  high: number;
+  low: number;
+  open: number;
+  timestamp: string;
+  symbol: string;
+};
+
+export type BarObjectWithIndicators = BarObject & {
+  ema9: number | null;
+  ema21: number | null;
+  emaGap: number | null;
+  macd: number | null | undefined;
+  macdSignal: number | null | undefined;
+  macdGap: number | null | undefined;
+  rsi: number | null;
+  macdTrend?: string;
+};
+
+export type BarObjectWithSignals = BarObjectWithIndicators & {
+  signal: number;
+};
+
+export type FetchedHistoricalDataObject = {
+  data?: BarObject[];
+  error?: string;
+};

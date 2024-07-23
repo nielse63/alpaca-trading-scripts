@@ -1,4 +1,5 @@
 import { ICacheObject } from './types.d';
+import path from 'path';
 
 export const PAPER_URL = 'https://paper-api.alpaca.markets/v2';
 export const SYMBOL = 'BAC';
@@ -50,3 +51,5 @@ export const cache: ICacheObject = {
   bars: [],
   positions: [],
 };
+export const STDOUT_LOG_FILE = path.resolve(__dirname, '../stdout.log');
+export const STDERR_LOG_FILE = path.resolve(__dirname, '../stderr.log');

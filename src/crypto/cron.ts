@@ -1,9 +1,6 @@
-import { log } from '../helpers';
 import run from './run';
 
 const fn = async () => {
-  console.log('');
-  log('executing crypto script');
   await run();
 };
 

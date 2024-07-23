@@ -1,40 +1,12 @@
-import { subDays } from 'date-fns';
+import { subMinutes } from 'date-fns';
 import { EMA, MACD, RSI } from 'technicalindicators';
 import alpaca from '../alpaca';
-
-type AlpacaBarObject = {
-  Close: number;
-  High: number;
-  Low: number;
-  TradeCount: number;
-  Open: number;
-  Timestamp: string;
-  Volume: number;
-  VWAP: number;
-};
-
-type BarObject = {
-  close: number;
-  high: number;
-  low: number;
-  open: number;
-  timestamp: string;
-  symbol: string;
-};
-
-type BarObjectWithIndicators = BarObject & {
-  ema9: number | null;
-  ema21: number | null;
-  emaGap: number | null;
-  macd: number | null | undefined;
-  macdSignal: number | null | undefined;
-  macdGap: number | null | undefined;
-  rsi: number | null;
-};
-
-type BarObjectWithSignals = BarObjectWithIndicators & {
-  signal: number;
-};
+import {
+  AlpacaBarObject,
+  BarObject,
+  BarObjectWithIndicators,
+  BarObjectWithSignals,
+} from './types.d';
 
 export const CRYPTO_UNIVERSE = [
   'AAVE',
@@ -61,7 +33,8 @@ export const CRYPTO_UNIVERSE = [
 
 export async function fetchHistoricalData(symbol: string) {
   const end = new Date();
-  const start = subDays(end, 3).toISOString();
+  const limit = 100;
+  const start = subMinutes(end, 15 * limit).toISOString();
   const response: Map<string, AlpacaBarObject[]> = await alpaca.getCryptoBars(
     [symbol],
     {
@@ -82,7 +55,7 @@ export async function fetchHistoricalData(symbol: string) {
       symbol,
     })
   );
-  return formattedData.slice(-200);
+  return formattedData;
 }
 
 export const formatIndicatorArray = (
@@ -95,6 +68,23 @@ export const formatIndicatorArray = (
     i += 1;
   }
   return array.map((d) => (d === undefined ? null : d));
+};
+
+export const getMACDTrend = (data: (number | null)[], index: number) => {
+  if (index < 3) return 'UNKNOWN';
+  let i = 0;
+  const output = [];
+  while (i < 3) {
+    const value: number | null = data[index - i] || null;
+    if (value) {
+      output.push(value);
+    }
+    i += 1;
+  }
+  if (output.length < 3) return 'UNKNOWN';
+  if (output[2] > output[1] && output[1] > output[0]) return 'UP';
+  if (output[2] <= output[1] && output[1] <= output[0]) return 'DOWN';
+  return 'NEUTRAL';
 };
 
 export function calculateIndicators(
@@ -151,6 +141,7 @@ export function calculateIndicators(
     const macd = macdArray[i] ? macdArray[i] : null;
     const macdSignal = macdSignalArray[i] ? macdSignalArray[i] : null;
     const macdGap = macd && macdSignal && Math.abs(macdSignal - macd);
+    const macdTrend = getMACDTrend(macdArray, i);
 
     return {
       ...d,
@@ -161,6 +152,7 @@ export function calculateIndicators(
       macdSignal,
       macdGap,
       rsi: rsi[i] || null,
+      macdTrend,
     };
   });
 }
@@ -202,17 +194,21 @@ export function generateSignals(
       // sell signal
     } else if (
       signal !== -1 &&
+      d.macdTrend === 'DOWN' &&
       d.ema9 < d.ema21 &&
+      d.rsi > 30 /*&&
       prev.ema9 !== null &&
       prev.ema21 !== null &&
       prev.ema9 >= prev.ema21 &&
       d.macd < d.macdSignal &&
-      d.rsi > 30 /*&&
       d.rsi < 70*/
     ) {
       signal = -1;
     }
 
-    return { ...d, signal };
+    return {
+      ...d,
+      signal,
+    };
   });
 }

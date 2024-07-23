@@ -4,7 +4,7 @@ import { AlpacaPosition } from './types.d';
 
 const getCryptoPositions = async () => {
   const positions: AlpacaPosition[] = await alpaca.getPositions();
-  const crypotPositions = positions
+  const cryptoPositions = positions
     .filter((position) => {
       return position.asset_class === 'crypto';
     })
@@ -24,8 +24,8 @@ const getCryptoPositions = async () => {
         symbol: `${symbol}/USD`,
       };
     });
-  log(`current positions: ${crypotPositions.map((p) => p.symbol).join(', ')}`);
-  return crypotPositions;
+  log(`current positions: ${cryptoPositions.map((p) => p.symbol).join(', ')}`);
+  return cryptoPositions;
 };
 
 export default getCryptoPositions;
