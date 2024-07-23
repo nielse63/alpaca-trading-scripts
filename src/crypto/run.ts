@@ -1,9 +1,9 @@
 import { getBuyingPower } from '../account';
 import alpaca from '../alpaca';
-import { log } from '../helpers';
+import { error as errorLogger, log } from '../helpers';
 import { waitForOrderFill } from '../order';
-import getCryptoPositions from './getCryptoPositions';
 import closePositions from './closePositions';
+import getCryptoPositions from './getCryptoPositions';
 import {
   calculateIndicators,
   CRYPTO_UNIVERSE,
@@ -51,29 +51,45 @@ const run = async () => {
   const amountPerPosition = availableCapital / shouldBuy.length;
   for (const lastBar of shouldBuy) {
     const { symbol } = lastBar;
-    const qty = parseFloat((amountPerPosition / lastBar.close).toFixed(2));
+    const qty = parseFloat((amountPerPosition / lastBar.close).toFixed(4));
     if (qty > 0) {
-      log(`Placing buy order for ${qty} shares of ${symbol}`);
-      const buyOrder = await alpaca.createOrder({
-        symbol: symbol,
-        qty: qty,
-        side: 'buy',
-        type: 'market',
-        time_in_force: 'day',
-      });
-      await waitForOrderFill(buyOrder.id);
-      log(`buy order placed: ${JSON.stringify(buyOrder, null, 2)}`);
-      const tslOrder = await alpaca.createOrder({
-        symbol: symbol,
-        qty: buyOrder.qty,
-        side: 'sell',
-        type: 'trailing_stop',
-        trail_percent: 5,
-        time_in_force: 'gtc',
-      });
-      log(
-        `trailing stop loss order placed: ${JSON.stringify(tslOrder, null, 2)}`
-      );
+      let buyOrder;
+      // let tslOrder;
+      try {
+        log(`Placing buy order for ${qty} shares of ${symbol}`);
+        buyOrder = await alpaca.createOrder({
+          symbol: symbol,
+          qty: qty,
+          side: 'buy',
+          type: 'market',
+          time_in_force: 'ioc',
+        });
+        await waitForOrderFill(buyOrder.id);
+        log(`buy order placed: ${JSON.stringify(buyOrder, null, 2)}`);
+      } catch (error: any) {
+        console.error(error.response.data);
+        errorLogger('error placing buy order');
+        errorLogger(error);
+      }
+
+      // try {
+      //   tslOrder = await alpaca.createOrder({
+      //     symbol: symbol,
+      //     qty: buyOrder.qty,
+      //     side: 'sell',
+      //     type: 'trailing_stop',
+      //     trail_percent: 5,
+      //     time_in_force: 'gtc',
+      //   });
+      //   log(
+      //     `trailing stop loss order placed: ${JSON.stringify(tslOrder, null, 2)}`
+      //   );
+      //   await waitForOrderFill(buyOrder.id);
+      // } catch (error) {
+      //   console.error(error);
+      //   errorLogger('error placing trailing stop loss order');
+      //   errorLogger(error);
+      // }
     }
   }
 };
