@@ -1,9 +1,13 @@
 import { log } from '../helpers';
 import run from './run';
 
-const TIME_INTERVAL = 1000 * 60 * 15; // 15 minutes
-setInterval(async () => {
+const fn = async () => {
   log('');
   log(`executing crypto at ${new Date().toISOString()}`);
   await run();
-}, TIME_INTERVAL);
+};
+const TIME_INTERVAL = 1000 * 60 * 15; // 15 minutes
+
+fn().then(() => {
+  setInterval(fn, TIME_INTERVAL);
+});

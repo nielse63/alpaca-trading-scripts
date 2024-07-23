@@ -96,17 +96,6 @@ export async function placeOrder(data: BarObjectWithSignals[], symbol: string) {
   console.log('');
 }
 
-const runForSymbol = async (symbol: string) => {
-  const data = await fetchHistoricalData(symbol);
-  const dataWithIndicators = calculateIndicators(data);
-  const dataWithSignals = generateSignals(dataWithIndicators);
-  try {
-    await placeOrder(dataWithSignals, symbol);
-  } catch (error) {
-    log(`Error placing order: ${error}`);
-  }
-};
-
 const run = async () => {
   const positions = await alpaca.getPositions();
   const crypotPositions = positions
@@ -133,11 +122,57 @@ const run = async () => {
     }
   }
 
+  // determine what we can buy
+  const shouldBuy = [];
+  const availableCapital = await getBuyingPower();
   for (const symbol of CRYPTO_UNIVERSE) {
-    await runForSymbol(symbol);
+    const data = await fetchHistoricalData(symbol);
+    const dataWithIndicators = calculateIndicators(data);
+    const dataWithSignals = generateSignals(dataWithIndicators);
+    const lastBar = dataWithSignals[data.length - 1];
+    if (lastBar.signal === 1) {
+      shouldBuy.push({ ...lastBar, symbol });
+    }
+  }
+  if (!shouldBuy.length) {
+    log('no assets to buy');
+    return;
+  }
+
+  log('assets to buy:');
+  shouldBuy.forEach((b) => {
+    log(`- ${b.symbol}`);
+  });
+  const amountPerPosition = availableCapital / shouldBuy.length;
+  for (const lastBar of shouldBuy) {
+    const { symbol } = lastBar;
+    const qty = parseFloat((amountPerPosition / lastBar.close).toFixed(0));
+    if (qty > 0) {
+      log(`Placing buy order for ${qty} shares of ${symbol}`);
+      const buyOrder = await alpaca.createOrder({
+        symbol: symbol,
+        qty: qty,
+        side: 'buy',
+        type: 'market',
+        time_in_force: 'day',
+      });
+      await waitForOrderFill(buyOrder.id);
+      log(`buy order placed: ${JSON.stringify(buyOrder, null, 2)}`);
+      const tslOrder = await alpaca.createOrder({
+        symbol: symbol,
+        qty: buyOrder.qty,
+        side: 'sell',
+        type: 'trailing_stop',
+        trail_percent: 5,
+        time_in_force: 'gtc',
+      });
+      log(
+        `trailing stop loss order placed: ${JSON.stringify(tslOrder, null, 2)}`
+      );
+    }
   }
 };
 
-// run().catch(console.error);
+run().catch(console.error);
 
 export default run;
