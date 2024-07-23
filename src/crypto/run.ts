@@ -3,7 +3,7 @@ import { getBuyingPower } from '../account';
 import alpaca from '../alpaca';
 import { STDERR_LOG_FILE, STDOUT_LOG_FILE } from '../constants';
 import { error as errorLogger, log } from '../helpers';
-import { waitForOrderFill } from '../order';
+// import { waitForOrderFill } from '../order';
 import closePositions from './closePositions';
 import getCryptoPositions from './getCryptoPositions';
 import {
@@ -29,6 +29,7 @@ const run = async () => {
 
   // get current positions
   const cryptoPositions = await getCryptoPositions();
+  const cryptoSymbols = cryptoPositions.map((p) => p.symbol);
 
   // determine if we need to sell open positions
   const closedPositions = await closePositions(cryptoPositions);
@@ -36,7 +37,8 @@ const run = async () => {
   // determine what we can buy
   // parallel fetch historical data
   const symbolsToFetch = CRYPTO_UNIVERSE.filter(
-    (symbol) => !closedPositions.includes(symbol)
+    (symbol) =>
+      !closedPositions.includes(symbol) && !cryptoSymbols.includes(symbol)
   );
   const fetchPromises = symbolsToFetch.map((symbol) =>
     fetchHistoricalData(symbol)
@@ -120,7 +122,7 @@ const run = async () => {
         type: 'market',
         time_in_force: 'ioc',
       });
-      await waitForOrderFill(buyOrder.id);
+      // await waitForOrderFill(buyOrder.id);
       log(`buy order placed: ${JSON.stringify(buyOrder, null, 2)}`);
     } catch (error: any) {
       console.error(error?.response?.data);
