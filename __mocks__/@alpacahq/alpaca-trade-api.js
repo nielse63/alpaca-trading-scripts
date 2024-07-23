@@ -129,6 +129,13 @@ class Alpaca {
       source: null,
     };
   }
+
+  async closePosition(symbol) {
+    return {
+      message: 'Position is being liquidated',
+      symbol,
+    };
+  }
 }
 
 export default Alpaca;

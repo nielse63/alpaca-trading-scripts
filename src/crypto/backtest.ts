@@ -3,10 +3,9 @@
 // import { log } from '../helpers';
 import {
   calculateIndicators,
+  CRYPTO_UNIVERSE,
   fetchHistoricalData,
   generateSignals,
-  // CRYPTO_SYMBOL,
-  CRYPTO_UNIVERSE,
 } from './helpers';
 
 type BarObject = {

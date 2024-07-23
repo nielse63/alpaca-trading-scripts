@@ -19,4 +19,22 @@ export default [
     change_today: '-0.0064640990903813',
     qty_available: '1',
   },
+  {
+    asset_id: '123',
+    symbol: 'AAVE',
+    exchange: 'CRYPTO',
+    asset_class: 'crypto',
+  },
+  {
+    asset_id: '456',
+    symbol: 'AVAX/USD',
+    exchange: 'CRYPTO',
+    asset_class: 'crypto',
+  },
+  {
+    asset_id: '789',
+    symbol: 'BATUSD',
+    exchange: 'CRYPTO',
+    asset_class: 'crypto',
+  },
 ];

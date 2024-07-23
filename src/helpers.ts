@@ -1,4 +1,5 @@
-const logToFile = require('log-to-file');
+import { format } from 'date-fns';
+import fs from 'fs-extra';
 
 export const isNumeric = (value: unknown) => {
   if (typeof value != 'string') return false;
@@ -29,12 +30,26 @@ export const generatorToArray = async (resp: AsyncGenerator): Promise<any> => {
   return result;
 };
 
-export const log = (message?: any, ...optionalParams: any[]): void => {
-  console.log(message, ...optionalParams);
-  logToFile(message, 'stdout.log');
+export const logToFile = (msg: string, filepath: string) => {
+  if (!msg) return;
+  fs.ensureFileSync(filepath);
+  const content = fs.readFileSync(filepath, 'utf8');
+  const newContent = `${content}\n${msg}`;
+  fs.writeFileSync(filepath, newContent);
 };
 
-export const error = (message?: any, ...optionalParams: any[]): void => {
-  console.error(message, ...optionalParams);
-  logToFile(message, 'stderr.log');
+export const log = async (message?: any, ...optionalParams: any[]) => {
+  if (process.env.NODE_ENV === 'test') return;
+  const date = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
+  const msg = `${date}: ${message}`;
+  console.log(msg, ...optionalParams);
+  logToFile(msg, 'stdout.log');
+};
+
+export const error = async (message?: any, ...optionalParams: any[]) => {
+  if (process.env.NODE_ENV === 'test') return;
+  const date = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
+  const msg = `${date}: ${message}`;
+  console.error(msg, ...optionalParams);
+  logToFile(msg, 'stderr.log');
 };

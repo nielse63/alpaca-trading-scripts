@@ -2,8 +2,8 @@ import { log } from '../helpers';
 import run from './run';
 
 const fn = async () => {
-  log('');
-  log(`executing crypto at ${new Date()}`);
+  console.log('');
+  log('executing crypto script');
   await run();
 };
 
