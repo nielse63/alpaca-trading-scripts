@@ -8,6 +8,5 @@ const fn = async () => {
 };
 const TIME_INTERVAL = 1000 * 60 * 15; // 15 minutes
 
-fn().then(() => {
-  setInterval(fn, TIME_INTERVAL);
-});
+fn();
+setInterval(fn, TIME_INTERVAL);
