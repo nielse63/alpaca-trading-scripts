@@ -1,9 +1,17 @@
 import { getBuyingPower } from './account';
 import alpaca from './alpaca';
-import { getCurrentPrice, getLastBar } from './bars';
+import { applyIndicators, applySignals } from './bars';
+import getStockBars from './getStockBars';
 import { SYMBOL, TRAILING_STOP_LOSS_PERCENT } from './constants';
 import { log } from './helpers';
-import { getPositions } from './position';
+
+export const getBarsWithSignals = async (symbol: string, timeframe: string) => {
+  const bars = await getStockBars(symbol, timeframe);
+  console.log({ symbol, timeframe, bars });
+  const barsWithIndicators = applyIndicators(bars);
+  const barsWithSignals = applySignals(barsWithIndicators);
+  return barsWithSignals;
+};
 
 export const waitForOrderFill = (orderId: string) =>
   new Promise((resolve, reject) => {
@@ -24,16 +32,13 @@ export const waitForOrderFill = (orderId: string) =>
   });
 
 export const getShouldBuy = async () => {
-  const buyingPower = await getBuyingPower();
+  const barsWithSignals = await getBarsWithSignals(SYMBOL, '1Day');
 
   // true if sma_fast > sma_slow
-  const { ema } = await getLastBar();
-  const output = ema.fast > ema.slow;
-  log(
-    `should buy: ${output} (buyingPower = ${buyingPower}; ema.fast = ${ema.fast}; ema.slow = ${ema.slow})`
-  );
-  return true;
-  // return output;
+  const output = barsWithSignals.signals.buy;
+  const { emaFast, emaSlow } = barsWithSignals.lastIndicators;
+  log(`should buy: ${output} (ema.fast = ${emaFast}; ema.slow = ${emaSlow})`);
+  return output;
 };
 
 export const buy = async () => {
@@ -43,14 +48,17 @@ export const buy = async () => {
   // determine if we meet buy conditions
   if (await getShouldBuy()) {
     const buyingPower = await getBuyingPower();
-    const currentPrice = await getCurrentPrice();
-    const qty = Math.floor(buyingPower / currentPrice);
+
+    // get latest quotes
+    const quote = await alpaca.getLatestQuote(SYMBOL);
+    const latestBidPrice = quote.BidPrice;
+    const qty = Math.floor(buyingPower / latestBidPrice);
     if (qty < 1) {
       log('[info] not enough buying power');
       return;
     }
 
-    log('[info] buying', qty, 'of', SYMBOL, 'at', currentPrice);
+    log('[info] buying', qty, 'of', SYMBOL, 'at', latestBidPrice);
     const buyOrder = await alpaca.createOrder({
       symbol: SYMBOL,
       qty: qty,
@@ -73,18 +81,17 @@ export const buy = async () => {
 };
 
 export const getShouldSell = async () => {
-  const positions = await getPositions();
-  const { ema } = await getLastBar();
-  const output = Boolean(positions.length && ema.fast < ema.slow);
-  log(
-    `should sell: ${output} (positions.length = ${positions.length}; ema.fast = ${ema.fast}; ema.slow = ${ema.slow})`
-  );
+  const barsWithSignals = await getBarsWithSignals(SYMBOL, '1Day');
+  console.log({ barsWithSignals });
+  const output = barsWithSignals.signals.sell;
+  const { emaFast, emaSlow } = barsWithSignals.lastIndicators;
+  log(`should sell: ${output} (ema.fast = ${emaFast}; ema.slow = ${emaSlow})`);
   return output;
 };
 
 export const sell = async () => {
   if (await getShouldSell()) {
-    await alpaca.cancelAllOrders();
+    // await alpaca.cancelAllOrders();
     await alpaca.closePosition(SYMBOL);
   }
 };

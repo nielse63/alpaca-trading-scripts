@@ -1,4 +1,4 @@
-import { IndicatorsObjectType, SignalsObjectType } from '../types.d';
+import { IndicatorsObjectType, SignalsObjectType } from '../crypto/types.d';
 
 const applySignals = (data: IndicatorsObjectType): SignalsObjectType => {
   const output = {

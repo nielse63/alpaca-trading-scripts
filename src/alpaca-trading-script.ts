@@ -26,18 +26,18 @@ const alpacaTradingScript = async () => {
   }
 
   // get positions
-  log('[info] getting positions');
+  log('getting positions');
   const positions = await getPositions();
 
   // if we have open positions, determine if they should be sold
   if (positions.length) {
-    log('[info] running sell function');
+    log('running sell function');
     await sell();
   }
-  // if we have more than $1, see what (and if) we can buy
+  // if we have more than $10, see what (and if) we can buy
   const buyingPower = await getBuyingPower();
-  if (buyingPower > 1) {
-    log('[info] running buy function');
+  if (buyingPower > 10) {
+    log('running buy function');
     await buy();
   }
 };

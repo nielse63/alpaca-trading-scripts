@@ -5,7 +5,7 @@ export const MACD_LONG_INTERVAL = 26;
 export const MACD_SIGNAL_INTERVAL = 9;
 export const RSI_INTERVAL = 14;
 export const BARS_TIMEFRAME_MINUTES = 15;
-export const BARS_TIMEFRAME_STRING = '15Min';
+export const BARS_TIMEFRAME_STRING = '1Hour';
 export const CRYPTO_UNIVERSE = [
   'AAVE',
   'AVAX',

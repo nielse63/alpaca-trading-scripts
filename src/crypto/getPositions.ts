@@ -2,7 +2,7 @@ import alpaca from '../alpaca';
 import { log } from '../helpers';
 import { AlpacaPosition } from './types.d';
 
-const getCryptoPositions = async () => {
+const getPositions = async () => {
   const positions: AlpacaPosition[] = await alpaca.getPositions();
   const cryptoPositions = positions
     .filter((position) => {
@@ -28,4 +28,4 @@ const getCryptoPositions = async () => {
   return cryptoPositions;
 };
 
-export default getCryptoPositions;
+export default getPositions;

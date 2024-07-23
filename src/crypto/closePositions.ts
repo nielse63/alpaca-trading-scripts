@@ -1,6 +1,6 @@
 import alpaca from '../alpaca';
 import { error, log } from '../helpers';
-import { getBarsWithSignals } from './services';
+import { getBarsWithSignals } from '../bars';
 import { AlpacaPosition } from './types.d';
 
 const closePositions = async (positions: AlpacaPosition[]) => {

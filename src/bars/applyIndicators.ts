@@ -6,8 +6,8 @@ import {
   MACD_SHORT_INTERVAL,
   MACD_SIGNAL_INTERVAL,
   RSI_INTERVAL,
-} from '../constants';
-import { BarObject, IndicatorsObjectType } from '../types.d';
+} from '../crypto/constants';
+import { BarObject, IndicatorsObjectType } from '../crypto/types.d';
 
 const applyIndicators = (bars: BarObject[]): IndicatorsObjectType => {
   const barsClone: any[] = [...bars].map((bar) => {

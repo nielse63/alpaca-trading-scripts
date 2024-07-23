@@ -2,18 +2,18 @@ import fs from 'fs-extra';
 import { getBuyingPower } from '../account';
 import alpaca from '../alpaca';
 import { STDERR_LOG_FILE, STDOUT_LOG_FILE } from '../constants';
-import { CRYPTO_UNIVERSE } from './constants';
 import { error as errorLogger, log } from '../helpers';
+import { CRYPTO_UNIVERSE } from './constants';
 // import { waitForOrderFill } from '../order';
 import closePositions from './closePositions';
-import getCryptoPositions from './getCryptoPositions';
+import getPositions from './getPositions';
+import { getBarsWithSignals } from '../bars';
 import {
   AlpacaQuoteObject,
   // BarObjectWithSignals,
   // FetchedHistoricalDataObject,
   SignalsObjectType,
 } from './types.d';
-import { getBarsWithSignals } from './services';
 
 const run = async () => {
   // clear existing logs
@@ -25,7 +25,7 @@ const run = async () => {
   log('executing crypto script');
 
   // get current positions
-  const cryptoPositions = await getCryptoPositions();
+  const cryptoPositions = await getPositions();
   const cryptoSymbols = cryptoPositions.map((p) => p.symbol);
 
   // determine if we need to sell open positions

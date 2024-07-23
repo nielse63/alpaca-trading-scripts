@@ -1,8 +1,8 @@
-import getCryptoPositions from '../getCryptoPositions';
+import getPositions from '../getPositions';
 
-describe('getCryptoPositions', () => {
+describe('getPositions', () => {
   it('should return an array of position objects', async () => {
-    const cryptoPositions = await getCryptoPositions();
+    const cryptoPositions = await getPositions();
     expect(cryptoPositions).toBeArray();
     cryptoPositions.forEach((position) => {
       expect(position).toBeObject();
@@ -11,14 +11,14 @@ describe('getCryptoPositions', () => {
   });
 
   it('should objects exclusively with asset_class == crypto', async () => {
-    const cryptoPositions = await getCryptoPositions();
+    const cryptoPositions = await getPositions();
     cryptoPositions.forEach((position) => {
       expect(position.asset_class).toEqual('crypto');
     });
   });
 
   it('should append `/USD` to symbols that dont have it', async () => {
-    const cryptoPositions = await getCryptoPositions();
+    const cryptoPositions = await getPositions();
     cryptoPositions.forEach((position) => {
       expect(position.symbol).toMatch(/[A-Z]{3,}\/USD$/);
     });
