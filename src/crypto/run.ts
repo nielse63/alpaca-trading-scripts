@@ -48,6 +48,9 @@ const run = async () => {
     log(`- ${b.symbol}`);
   });
   const availableCapital = await getBuyingPower();
+  if (availableCapital < 10) {
+    return;
+  }
   const amountPerPosition = availableCapital / shouldBuy.length;
   for (const lastBar of shouldBuy) {
     const { symbol } = lastBar;
