@@ -9,5 +9,5 @@ export const getAccount = async () => {
 
 export const getBuyingPower = async () => {
   const account = await getAccount();
-  return account.cash;
+  return account.non_marginable_buying_power;
 };

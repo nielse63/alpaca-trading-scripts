@@ -1,6 +1,6 @@
 import { format } from 'date-fns';
 import fs from 'fs-extra';
-import { STDOUT_LOG_FILE, STDERR_LOG_FILE } from './constants';
+// import { STDOUT_LOG_FILE, STDERR_LOG_FILE } from './constants';
 
 export const isNumeric = (value: unknown) => {
   if (typeof value != 'string') return false;
@@ -44,7 +44,7 @@ export const log = async (message?: any, ...optionalParams: any[]) => {
   const date = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
   const msg = `${date}: ${message}`;
   console.log(msg, ...optionalParams);
-  logToFile(msg, STDOUT_LOG_FILE);
+  // logToFile(msg, STDOUT_LOG_FILE);
 };
 
 export const error = async (message?: any, ...optionalParams: any[]) => {
@@ -52,5 +52,5 @@ export const error = async (message?: any, ...optionalParams: any[]) => {
   const date = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
   const msg = `${date}: ${message}`;
   console.error(msg, ...optionalParams);
-  logToFile(msg, STDERR_LOG_FILE);
+  // logToFile(msg, STDERR_LOG_FILE);
 };

@@ -4,8 +4,10 @@ export const MACD_SHORT_INTERVAL = 12;
 export const MACD_LONG_INTERVAL = 26;
 export const MACD_SIGNAL_INTERVAL = 9;
 export const RSI_INTERVAL = 14;
-export const BARS_TIMEFRAME_MINUTES = 15;
-export const BARS_TIMEFRAME_STRING = '1Hour';
+export const BARS_TIMEFRAME_MINUTES = 5;
+export const BARS_TIMEFRAME_STRING = '5Min';
+export const IS_DEV =
+  process.env.NODE_ENV === undefined || process.env.NODE_ENV === 'development';
 export const CRYPTO_UNIVERSE = [
   'AAVE',
   'AVAX',

@@ -6,6 +6,9 @@ module.exports = {
       instances: 1,
       // cron_restart: '*/15 * * * *',
       watch: ['dist'],
+      env: {
+        NODE_ENV: 'production',
+      },
     },
   ],
 };

@@ -8,8 +8,9 @@ import {
   STDOUT_LOG_FILE,
 } from '../constants';
 import { error as errorLogger, log } from '../helpers';
+import { waitForOrderFill } from '../order';
 import closePositions from './closePositions';
-import { CRYPTO_UNIVERSE } from './constants';
+import { BARS_TIMEFRAME_STRING, CRYPTO_UNIVERSE, IS_DEV } from './constants';
 import getPositions from './getPositions';
 import {
   AlpacaPosition,
@@ -24,7 +25,10 @@ export const runSell = async (cryptoPositions: AlpacaPosition[] = []) => {
     : await getPositions();
 
   // determine if we need to sell open positions
-  const closedPositions = await closePositions(positions, '15Min');
+  const closedPositions = await closePositions(
+    positions,
+    BARS_TIMEFRAME_STRING
+  );
   return closedPositions;
 };
 
@@ -92,7 +96,7 @@ const run = async (shouldRunSell: boolean = true) => {
   log(`assets to buy: ${symbols.join(', ')}`);
 
   // prevent buying if we have no capital
-  const amountPerPosition = availableCapital / shouldBuy.length;
+  const amountPerPosition = (availableCapital / shouldBuy.length) * 0.99;
 
   // get latest quotes
   const latestQuotes: Map<string, AlpacaQuoteObject> =
@@ -125,14 +129,16 @@ const run = async (shouldRunSell: boolean = true) => {
     // place buy order
     try {
       log(`Placing buy order for ${qty} shares of ${symbol}`);
-      await alpaca.createOrder({
-        symbol: symbol,
-        qty: qty,
-        side: 'buy',
-        type: 'market',
-        time_in_force: 'ioc',
-      });
-      // await waitForOrderFill(buyOrder.id);
+      if (!IS_DEV) {
+        const buyOrder = await alpaca.createOrder({
+          symbol: symbol,
+          qty: qty,
+          side: 'buy',
+          type: 'market',
+          time_in_force: 'ioc',
+        });
+        await waitForOrderFill(buyOrder.id);
+      }
       log(`buy order for ${symbol} completed successfully`);
     } catch (error: any) {
       errorLogger(`error placing buy order for ${symbol}`);
