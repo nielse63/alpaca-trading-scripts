@@ -3,18 +3,18 @@ import { getBuyingPower } from '../account';
 import alpaca from '../alpaca';
 import { getBarsWithSignals } from '../bars';
 import {
+  AVAILABLE_CAPITAL_THRESHOLD,
   STDERR_LOG_FILE,
   STDOUT_LOG_FILE,
-  AVAILABLE_CAPITAL_THRESHOLD,
 } from '../constants';
 import { error as errorLogger, log } from '../helpers';
 import closePositions from './closePositions';
 import { CRYPTO_UNIVERSE } from './constants';
 import getPositions from './getPositions';
 import {
+  AlpacaPosition,
   AlpacaQuoteObject,
   SignalsObjectType,
-  AlpacaPosition,
 } from './types.d';
 
 export const runSell = async (cryptoPositions: AlpacaPosition[] = []) => {
@@ -137,7 +137,6 @@ const run = async (shouldRunSell: boolean = true) => {
     } catch (error: any) {
       errorLogger(`error placing buy order for ${symbol}`);
       console.error(error?.response?.data);
-      errorLogger(JSON.stringify(error?.response?.data, null, 2));
     }
   }
 };
