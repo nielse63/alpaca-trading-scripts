@@ -1,18 +1,14 @@
-import run from './run';
+// import run from './run';
+import { buySymbol } from './buy';
 
 const runBuy = async () => {
-  await run();
+  // await run();
+  await buySymbol('AVAX/USD');
 };
 
-// const ONE_HOUR = 1000 * 60 * 60;
 const INTERVAL_DELAY = 1000 * 60 * 5;
 
-// run every 15 minutes
-// runSell().then(() => {
-//   setInterval(runSell, FIFTEEN_MIN);
-// });
-
-// run every hour
+// run every five minutes
 runBuy().then(() => {
   setInterval(runBuy, INTERVAL_DELAY);
 });

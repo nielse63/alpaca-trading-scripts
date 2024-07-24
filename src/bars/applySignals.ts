@@ -16,7 +16,7 @@ const applySignals = (data: IndicatorsObjectType): SignalsObjectType => {
 
   // determine buy signal
   const shouldBuy =
-    emaFast > emaSlow && macdValue > macdSignal && isMacdTrendUp && rsi < 70;
+    emaFast >= emaSlow && macdValue > macdSignal && isMacdTrendUp && rsi < 70;
   // console.log({
   //   symbol: data.symbol,
   //   emaFast,
@@ -36,7 +36,7 @@ const applySignals = (data: IndicatorsObjectType): SignalsObjectType => {
   }
 
   // determine sell signal
-  if (emaFast <= emaSlow && rsi > 30) {
+  if (emaFast < emaSlow && rsi > 30) {
     output.signals.sell = true;
     output.signals.buy = false;
   }

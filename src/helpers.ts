@@ -42,15 +42,13 @@ export const logToFile = (msg: string, filepath: string) => {
 export const log = async (message?: any, ...optionalParams: any[]) => {
   if (process.env.NODE_ENV === 'test') return;
   const date = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
-  const msg = `${date}: ${message}`;
-  console.log(msg, ...optionalParams);
+  console.log(date, message, ...optionalParams);
   // logToFile(msg, STDOUT_LOG_FILE);
 };
 
 export const error = async (message?: any, ...optionalParams: any[]) => {
   if (process.env.NODE_ENV === 'test') return;
   const date = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
-  const msg = `${date}: ${message}`;
-  console.error(msg, ...optionalParams);
+  console.error(date, message, ...optionalParams);
   // logToFile(msg, STDERR_LOG_FILE);
 };
