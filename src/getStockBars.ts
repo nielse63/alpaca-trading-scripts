@@ -1,9 +1,9 @@
+import { format, subDays, subHours, subMinutes } from 'date-fns';
 import alpaca from './alpaca';
 import { generatorToArray } from './helpers';
 import { AlpacaBar } from './types.d';
-import { subMinutes, subHours, subDays, format } from 'date-fns';
 
-const getBars = async (symbol: string, timeframe: string = '1Day') => {
+const getStockBars = async (symbol: string, timeframe: string = '1Day') => {
   let end = new Date();
   const limit = 150;
   let subFn = subMinutes;
@@ -39,4 +39,4 @@ const getBars = async (symbol: string, timeframe: string = '1Day') => {
   return formattedData;
 };
 
-export default getBars;
+export default getStockBars;

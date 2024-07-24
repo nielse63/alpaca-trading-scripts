@@ -1,19 +1,13 @@
 import fs from 'fs-extra';
 import { getBuyingPower } from '../account';
 import alpaca from '../alpaca';
+import { getBarsWithSignals } from '../bars';
 import { STDERR_LOG_FILE, STDOUT_LOG_FILE } from '../constants';
 import { error as errorLogger, log } from '../helpers';
-import { CRYPTO_UNIVERSE } from './constants';
-// import { waitForOrderFill } from '../order';
 import closePositions from './closePositions';
+import { CRYPTO_UNIVERSE } from './constants';
 import getPositions from './getPositions';
-import { getBarsWithSignals } from '../bars';
-import {
-  AlpacaQuoteObject,
-  // BarObjectWithSignals,
-  // FetchedHistoricalDataObject,
-  SignalsObjectType,
-} from './types.d';
+import { AlpacaQuoteObject, SignalsObjectType } from './types.d';
 
 const run = async () => {
   // clear existing logs
@@ -54,14 +48,9 @@ const run = async () => {
       if (!object) return acc;
       const { signals, lastIndicators } = object;
       const { close: lastClosePrice } = lastIndicators;
-      if (lastClosePrice >= 2) {
-        // const dataWithIndicators = calculateIndicators(data);
-        // const dataWithSignals = generateSignals(dataWithIndicators);
-        // const lastBar = dataWithSignals[data.length - 1];
-        // log(`${lastBar.symbol}:\n${JSON.stringify(dataWithSignals, null, 2)}`);
-        if (signals.buy) {
-          acc.push(object);
-        }
+      // console.log({ symbol: object.symbol, lastClosePrice, signals });
+      if (signals.buy && lastClosePrice < 100 /*&& lastClosePrice > 1*/) {
+        acc.push(object);
       }
       return acc;
     },
@@ -104,7 +93,7 @@ const run = async () => {
       costBasis = availableCapital;
       qty = parseFloat((costBasis / latestBidPrice).toFixed(4));
     }
-    console.log({ symbol, qty, costBasis });
+    console.log({ symbol, qty, costBasis, availableCapital });
 
     // prevent buying if cost basis is less than 1
     if (costBasis < 1) {
@@ -115,7 +104,7 @@ const run = async () => {
     // place buy order
     try {
       log(`Placing buy order for ${qty} shares of ${symbol}`);
-      const buyOrder = await alpaca.createOrder({
+      await alpaca.createOrder({
         symbol: symbol,
         qty: qty,
         side: 'buy',
@@ -123,31 +112,12 @@ const run = async () => {
         time_in_force: 'ioc',
       });
       // await waitForOrderFill(buyOrder.id);
-      log(`buy order placed: ${JSON.stringify(buyOrder, null, 2)}`);
+      log(`buy order for ${symbol} completed successfully`);
     } catch (error: any) {
+      errorLogger(`error placing buy order for ${symbol}`);
       console.error(error?.response?.data);
-      errorLogger('error placing buy order');
-      errorLogger(error);
+      errorLogger(error?.response?.data);
     }
-
-    // try {
-    //   const tslOrder = await alpaca.createOrder({
-    //     symbol: symbol,
-    //     qty: buyOrder.qty,
-    //     side: 'sell',
-    //     type: 'trailing_stop',
-    //     trail_percent: 5,
-    //     time_in_force: 'gtc',
-    //   });
-    //   log(
-    //     `trailing stop loss order placed: ${JSON.stringify(tslOrder, null, 2)}`
-    //   );
-    //   await waitForOrderFill(buyOrder.id);
-    // } catch (error) {
-    //   console.error(error);
-    //   errorLogger('error placing trailing stop loss order');
-    //   errorLogger(error);
-    // }
   }
 };
 
