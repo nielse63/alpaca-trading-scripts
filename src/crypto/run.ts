@@ -11,9 +11,24 @@ import { error as errorLogger, log } from '../helpers';
 import closePositions from './closePositions';
 import { CRYPTO_UNIVERSE } from './constants';
 import getPositions from './getPositions';
-import { AlpacaQuoteObject, SignalsObjectType } from './types.d';
+import {
+  AlpacaQuoteObject,
+  SignalsObjectType,
+  AlpacaPosition,
+} from './types.d';
 
-const run = async () => {
+export const runSell = async (cryptoPositions: AlpacaPosition[] = []) => {
+  log('executing `runSell` function');
+  const positions = cryptoPositions.length
+    ? cryptoPositions
+    : await getPositions();
+
+  // determine if we need to sell open positions
+  const closedPositions = await closePositions(positions, '15Min');
+  return closedPositions;
+};
+
+const run = async (shouldRunSell: boolean = true) => {
   // clear existing logs
   await fs.remove(STDOUT_LOG_FILE);
   await fs.remove(STDERR_LOG_FILE);
@@ -24,10 +39,10 @@ const run = async () => {
 
   // get current positions
   const cryptoPositions = await getPositions();
-  const cryptoSymbols = cryptoPositions.map((p) => p.symbol);
 
-  // determine if we need to sell open positions
-  const closedPositions = await closePositions(cryptoPositions);
+  // get current positions
+  const closedPositions = shouldRunSell ? await runSell(cryptoPositions) : [];
+  const cryptoSymbols = cryptoPositions.map((p) => p.symbol);
 
   // prevent further execution if we have no capital
   let availableCapital = await getBuyingPower();
@@ -122,7 +137,7 @@ const run = async () => {
     } catch (error: any) {
       errorLogger(`error placing buy order for ${symbol}`);
       console.error(error?.response?.data);
-      errorLogger(error?.response?.data);
+      errorLogger(JSON.stringify(error?.response?.data, null, 2));
     }
   }
 };

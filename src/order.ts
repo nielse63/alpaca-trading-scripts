@@ -7,7 +7,7 @@ import { log } from './helpers';
 
 export const getBarsWithSignals = async (symbol: string, timeframe: string) => {
   const bars = await getStockBars(symbol, timeframe);
-  console.log({ symbol, timeframe, bars });
+  // console.log({ symbol, timeframe, bars });
   const barsWithIndicators = applyIndicators(bars);
   const barsWithSignals = applySignals(barsWithIndicators);
   return barsWithSignals;
@@ -82,7 +82,7 @@ export const buy = async () => {
 
 export const getShouldSell = async () => {
   const barsWithSignals = await getBarsWithSignals(SYMBOL, '1Day');
-  console.log({ barsWithSignals });
+  // console.log({ barsWithSignals });
   const output = barsWithSignals.signals.sell;
   const { emaFast, emaSlow } = barsWithSignals.lastIndicators;
   log(`should sell: ${output} (ema.fast = ${emaFast}; ema.slow = ${emaSlow})`);

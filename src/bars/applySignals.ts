@@ -8,16 +8,15 @@ const applySignals = (data: IndicatorsObjectType): SignalsObjectType => {
       sell: false,
     },
   };
-  const { lastIndicators } = data;
+  const { lastIndicators, data: bars } = data;
   const { emaFast, emaSlow, macdValue, macdSignal, macdHistogram, rsi } =
     lastIndicators;
+  const secondToLast = bars[bars.length - 2];
+  const macdTrend = macdHistogram - secondToLast.macdHistogram!;
+  const isMacdTrendUp = macdValue > macdSignal && macdTrend > 0;
 
   // determine buy signal
-  if (
-    emaFast > emaSlow &&
-    (macdValue > macdSignal || macdHistogram > 0) &&
-    rsi < 70
-  ) {
+  if (emaFast > emaSlow && isMacdTrendUp && rsi < 70) {
     output.signals.buy = true;
   }
 

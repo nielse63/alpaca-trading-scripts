@@ -11,7 +11,8 @@
     "access": "public"
   },
   "scripts": {
-    "test": "jest",
+    "test": "dotenvx run --env-file=.env.test -- jest",
+    "test:coverage": "npm test -- --coverage",
     "prepare": "husky || true",
     "start": ".bin/run",
     "dev": "ts-node src/index.ts",
@@ -58,6 +59,7 @@
     "@babel/core": "^7.24.9",
     "@babel/preset-env": "^7.24.8",
     "@babel/preset-typescript": "^7.24.7",
+    "@dotenvx/dotenvx": "^1.6.4",
     "@types/fs-extra": "^11.0.4",
     "@types/jest": "^29.5.12",
     "@types/lodash.findlastindex": "^4.6.9",

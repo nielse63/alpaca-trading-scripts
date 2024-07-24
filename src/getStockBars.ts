@@ -21,12 +21,12 @@ const getStockBars = async (symbol: string, timeframe: string = '1Day') => {
     end: timeframe.includes('Day') ? format(end, 'yyyy-MM-dd') : end,
     sort: 'asc',
   };
-  console.log({ symbol, config });
+  // console.log({ symbol, config });
   const response = alpaca.getBarsV2(symbol, config);
-  console.log({ response });
+  // console.log({ response });
 
   const bars = await generatorToArray(response);
-  console.log({ bars });
+  // console.log({ bars });
 
   const formattedData = (bars as AlpacaBar[]).map((d: AlpacaBar) => ({
     close: d.ClosePrice,
