@@ -12,27 +12,9 @@ import { waitForOrderFill } from '../order';
 import closePositions from './closePositions';
 import { BARS_TIMEFRAME_STRING, CRYPTO_UNIVERSE, IS_DEV } from './constants';
 import getPositions from './getPositions';
-import {
-  AlpacaPosition,
-  AlpacaQuoteObject,
-  SignalsObjectType,
-} from './types.d';
+import { AlpacaQuoteObject, SignalsObjectType } from './types.d';
 
-export const runSell = async (cryptoPositions: AlpacaPosition[] = []) => {
-  log('executing `runSell` function');
-  const positions = cryptoPositions.length
-    ? cryptoPositions
-    : await getPositions();
-
-  // determine if we need to sell open positions
-  const closedPositions = await closePositions(
-    positions,
-    BARS_TIMEFRAME_STRING
-  );
-  return closedPositions;
-};
-
-const run = async (shouldRunSell: boolean = true) => {
+const run = async () => {
   // clear existing logs
   await fs.remove(STDOUT_LOG_FILE);
   await fs.remove(STDERR_LOG_FILE);
@@ -45,7 +27,10 @@ const run = async (shouldRunSell: boolean = true) => {
   const cryptoPositions = await getPositions();
 
   // get current positions
-  const closedPositions = shouldRunSell ? await runSell(cryptoPositions) : [];
+  const closedPositions = await closePositions(
+    cryptoPositions,
+    BARS_TIMEFRAME_STRING
+  );
   const cryptoSymbols = cryptoPositions.map((p) => p.symbol);
 
   // prevent further execution if we have no capital
@@ -108,7 +93,7 @@ const run = async (shouldRunSell: boolean = true) => {
 
     // determine qty and cost basis
     const latestBidPrice = latestQuotes.has(symbol)
-      ? latestQuotes.get(symbol)?.BidPrice
+      ? latestQuotes.get(symbol)?.AskPrice
       : undefined;
     if (!latestBidPrice) continue;
     let qty = parseFloat((amountPerPosition / latestBidPrice).toFixed(4));

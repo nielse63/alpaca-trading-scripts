@@ -1,7 +1,7 @@
-import { subMinutes, subHours, subDays } from 'date-fns';
+import { subDays, subHours, subMinutes } from 'date-fns';
 import alpaca from '../alpaca';
-import { AlpacaBarObject, BarObject } from '../crypto/types.d';
 import { BARS_TIMEFRAME_STRING } from '../crypto/constants';
+import { AlpacaBarObject, BarObject } from '../crypto/types.d';
 
 const getBars = async (
   symbol: string,
