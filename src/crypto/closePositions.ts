@@ -11,6 +11,7 @@ const closePositions = async (
   const closedPositions = [];
   for (const position of positions) {
     const { symbol, asset_id: assetId } = position;
+    console.log(`checking ${symbol} for close signal`);
     const barsWithSignals = await getBarsWithSignals(symbol, timeframe);
     if (!barsWithSignals.signals.sell) {
       continue;
