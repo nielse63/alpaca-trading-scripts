@@ -4,6 +4,7 @@ import { getIsMarketOpen } from './clock';
 import { error, log } from './helpers';
 import { buy, sell } from './order';
 import { getPositions } from './position';
+import { AVAILABLE_CAPITAL_THRESHOLD } from './constants';
 
 const alpacaTradingScript = async () => {
   log('[info] running at', moment().format('YYYY-MM-DD HH:mm:ss'));
@@ -36,7 +37,7 @@ const alpacaTradingScript = async () => {
   }
   // if we have more than $10, see what (and if) we can buy
   const buyingPower = await getBuyingPower();
-  if (buyingPower > 10) {
+  if (buyingPower > AVAILABLE_CAPITAL_THRESHOLD) {
     log('running buy function');
     await buy();
   }

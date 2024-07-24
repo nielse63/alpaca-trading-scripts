@@ -2,7 +2,11 @@ import fs from 'fs-extra';
 import { getBuyingPower } from '../account';
 import alpaca from '../alpaca';
 import { getBarsWithSignals } from '../bars';
-import { STDERR_LOG_FILE, STDOUT_LOG_FILE } from '../constants';
+import {
+  STDERR_LOG_FILE,
+  STDOUT_LOG_FILE,
+  AVAILABLE_CAPITAL_THRESHOLD,
+} from '../constants';
 import { error as errorLogger, log } from '../helpers';
 import closePositions from './closePositions';
 import { CRYPTO_UNIVERSE } from './constants';
@@ -24,6 +28,13 @@ const run = async () => {
 
   // determine if we need to sell open positions
   const closedPositions = await closePositions(cryptoPositions);
+
+  // prevent further execution if we have no capital
+  let availableCapital = await getBuyingPower();
+  if (availableCapital < AVAILABLE_CAPITAL_THRESHOLD) {
+    log('no available capital');
+    return;
+  }
 
   // determine what we can buy
   // parallel fetch historical data
@@ -66,11 +77,6 @@ const run = async () => {
   log(`assets to buy: ${symbols.join(', ')}`);
 
   // prevent buying if we have no capital
-  let availableCapital = await getBuyingPower();
-  if (availableCapital < 10) {
-    log('no available capital');
-    return;
-  }
   const amountPerPosition = availableCapital / shouldBuy.length;
 
   // get latest quotes
