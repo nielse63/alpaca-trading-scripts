@@ -57,8 +57,8 @@ export const buySymbol = async (symbol: string, purchaseLength: number = 1) => {
       symbol: symbol,
       qty: qty,
       side: 'buy',
-      type: 'limit',
-      limit_price: limitPrice,
+      type: 'market',
+      // limit_price: limitPrice,
       time_in_force: 'gtc',
     };
     log(`Placing buy order for ${qty} shares of ${symbol}:`, buyConfig);
