@@ -7,7 +7,7 @@ import { waitForOrderFill } from '../order';
 import { IS_DEV } from './constants';
 import { AlpacaQuoteObject } from './types.d';
 
-export const buySymbol = async (symbol: string) => {
+export const buySymbol = async (symbol: string, purchaseLength: number = 1) => {
   log(`attempting to buy symbol: ${symbol}`);
   const barWithSignals = await getBarsWithSignals(symbol);
   const { signals, lastIndicators } = barWithSignals;
@@ -19,7 +19,9 @@ export const buySymbol = async (symbol: string) => {
   }
 
   const availableCapital = await getBuyingPower();
-  const buyingPower = parseFloat((availableCapital * 0.95).toFixed(2));
+  const buyingPower = parseFloat(
+    ((availableCapital / purchaseLength) * 0.975).toFixed(2)
+  );
   if (buyingPower < AVAILABLE_CAPITAL_THRESHOLD) {
     log('no available capital');
     return;
@@ -69,6 +71,6 @@ export const buySymbol = async (symbol: string) => {
 
 export const buySymbols = async (symbols: string[]) => {
   for (const symbol of symbols) {
-    await buySymbol(symbol);
+    await buySymbol(symbol, symbols.length);
   }
 };
