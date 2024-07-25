@@ -1,6 +1,7 @@
 import { getBuyingPower } from '../account';
 import alpaca from '../alpaca';
 import { getBarsWithSignals } from '../bars';
+import { AVAILABLE_CAPITAL_THRESHOLD } from '../constants';
 import { error as errorLogger, log } from '../helpers';
 import { waitForOrderFill } from '../order';
 import { IS_DEV } from './constants';
@@ -19,6 +20,10 @@ export const buySymbol = async (symbol: string) => {
 
   const availableCapital = await getBuyingPower();
   const buyingPower = parseFloat((availableCapital * 0.95).toFixed(2));
+  if (buyingPower < AVAILABLE_CAPITAL_THRESHOLD) {
+    log('no available capital');
+    return;
+  }
 
   // get latest quotes
   const latestQuote: Map<string, AlpacaQuoteObject> =
