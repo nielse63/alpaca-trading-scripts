@@ -29,17 +29,17 @@ export const buySymbol = async (symbol: string) => {
   const latestQuote: Map<string, AlpacaQuoteObject> =
     await alpaca.getLatestCryptoQuotes([symbol]);
 
-  const latestBidPrice = latestQuote.has(symbol)
+  const latestAskPrice = latestQuote.has(symbol)
     ? latestQuote.get(symbol)?.AskPrice
     : undefined;
-  if (!latestBidPrice) {
+  if (!latestAskPrice) {
     errorLogger(`no latest bid price for ${symbol}`);
     return;
   }
-  let qty = parseFloat((availableCapital / latestBidPrice).toFixed(2));
-  const costBasis = parseFloat((qty * latestBidPrice).toFixed(2));
+  let qty = parseFloat((availableCapital / latestAskPrice).toFixed(2));
+  const costBasis = parseFloat((qty * latestAskPrice).toFixed(2));
   if (costBasis > availableCapital) {
-    qty = parseFloat((buyingPower / latestBidPrice).toFixed(2));
+    qty = parseFloat((buyingPower / latestAskPrice).toFixed(2));
   }
 
   if (costBasis < 1) {
@@ -55,7 +55,8 @@ export const buySymbol = async (symbol: string) => {
         symbol: symbol,
         qty: qty,
         side: 'buy',
-        type: 'market',
+        type: 'limit',
+        limit_price: latestAskPrice,
         time_in_force: 'ioc',
       });
       await waitForOrderFill(buyOrder.id);
