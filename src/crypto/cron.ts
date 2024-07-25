@@ -1,9 +1,7 @@
-// import run from './run';
-import { buySymbol } from './buy';
+import run from './run';
 
 const runBuy = async () => {
-  // await run();
-  await buySymbol('AVAX/USD');
+  await run();
 };
 
 const INTERVAL_DELAY = 1000 * 60 * 5;
