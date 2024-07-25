@@ -3,6 +3,7 @@ import { getBarsWithSignals } from '../bars';
 import { error, log } from '../helpers';
 import { BARS_TIMEFRAME_STRING, IS_DEV } from './constants';
 import { AlpacaPosition } from './types.d';
+import { deleteOrdersForSymbol } from './orders';
 
 const closePositions = async (
   positions: AlpacaPosition[],
@@ -20,7 +21,7 @@ const closePositions = async (
       closedPositions.push(symbol);
       log(`closing all posiitons for ${symbol}`);
       if (!IS_DEV) {
-        await alpaca.cancelAllOrders();
+        await deleteOrdersForSymbol(symbol);
         await alpaca.closePosition(assetId);
       }
     } catch (e: any) {
