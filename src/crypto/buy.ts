@@ -8,7 +8,7 @@ import { IS_DEV } from './constants';
 import { AlpacaQuoteObject } from './types.d';
 
 export const buySymbol = async (symbol: string, purchaseLength: number = 1) => {
-  log(`attempting to buy symbol: ${symbol}`);
+  log(`evaluating buy signals for: ${symbol}`);
   const barWithSignals = await getBarsWithSignals(symbol);
   const { signals, lastIndicators } = barWithSignals;
   const shouldBuy = signals.buy;
@@ -30,18 +30,20 @@ export const buySymbol = async (symbol: string, purchaseLength: number = 1) => {
   // get latest quotes
   const latestQuote: Map<string, AlpacaQuoteObject> =
     await alpaca.getLatestCryptoQuotes([symbol]);
-
-  const latestAskPrice = latestQuote.has(symbol)
-    ? latestQuote.get(symbol)?.AskPrice
-    : undefined;
-  if (!latestAskPrice) {
-    errorLogger(`no latest bid price for ${symbol}`);
+  if (!latestQuote.has(symbol)) {
+    errorLogger(`no latest quote for ${symbol}`);
     return;
   }
-  let qty = parseFloat((availableCapital / latestAskPrice).toFixed(2));
-  const costBasis = parseFloat((qty * latestAskPrice).toFixed(2));
+
+  const { AskPrice: latestAskPrice, BidPrice: latestBidPrice } =
+    latestQuote.get(symbol) as AlpacaQuoteObject;
+  const limitPrice = parseFloat(
+    ((latestAskPrice - latestBidPrice) / 2 + latestBidPrice).toFixed(2)
+  );
+  let qty = parseFloat((availableCapital / limitPrice).toFixed(2));
+  const costBasis = parseFloat((qty * limitPrice).toFixed(2));
   if (costBasis > availableCapital) {
-    qty = parseFloat((buyingPower / latestAskPrice).toFixed(2));
+    qty = parseFloat((buyingPower / limitPrice).toFixed(2));
   }
 
   if (costBasis < 1) {
@@ -51,17 +53,21 @@ export const buySymbol = async (symbol: string, purchaseLength: number = 1) => {
 
   // place buy order
   try {
-    log(`Placing buy order for ${qty} shares of ${symbol}`);
+    const buyConfig = {
+      symbol: symbol,
+      qty: qty,
+      side: 'buy',
+      type: 'limit',
+      limit_price: limitPrice,
+      time_in_force: 'gtc',
+    };
+    log(`Placing buy order for ${qty} shares of ${symbol}:`, buyConfig);
     if (!IS_DEV) {
-      const buyOrder = await alpaca.createOrder({
-        symbol: symbol,
-        qty: qty,
-        side: 'buy',
-        type: 'limit',
-        limit_price: latestAskPrice,
-        time_in_force: 'ioc',
-      });
-      await waitForOrderFill(buyOrder.id);
+      await alpaca.cancelAllOrders();
+      const buyOrder = await alpaca.createOrder(buyConfig);
+      if (buyConfig.type === 'market') {
+        await waitForOrderFill(buyOrder.id);
+      }
     }
     log(`buy order for ${symbol} completed successfully`);
   } catch (error: any) {
