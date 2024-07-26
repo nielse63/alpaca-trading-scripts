@@ -5,8 +5,8 @@ import { AVAILABLE_CAPITAL_THRESHOLD } from '../constants';
 import { error as errorLogger, log } from '../helpers';
 import { waitForOrderFill } from '../order';
 import { IS_DEV } from './constants';
+import { createStopLimitSellOrder, deleteBuyOrdersForSymbol } from './orders';
 import { AlpacaQuoteObject } from './types.d';
-import { deleteBuyOrdersForSymbol } from './orders';
 
 export const buySymbol = async (symbol: string, buyingPower: number) => {
   log(`evaluating buy signals for: ${symbol}`);
@@ -63,6 +63,11 @@ export const buySymbol = async (symbol: string, buyingPower: number) => {
       const buyOrder = await alpaca.createOrder(buyConfig);
       if (buyConfig.type === 'market') {
         await waitForOrderFill(buyOrder.id);
+        await createStopLimitSellOrder(
+          symbol,
+          parseFloat(buyOrder.filled_qty),
+          parseFloat(buyOrder.filled_avg_price)
+        );
       }
     }
     log(`buy order for ${symbol} completed successfully`);
@@ -80,7 +85,15 @@ export const buySymbols = async (symbols: string[]) => {
     return;
   }
   for (const symbol of symbols) {
-    await deleteBuyOrdersForSymbol(symbol);
-    await buySymbol(symbol, buyingPower);
+    try {
+      await deleteBuyOrdersForSymbol(symbol);
+    } catch (error) {
+      errorLogger(`error deleting buy orders for ${symbol}`, error);
+    }
+    try {
+      await buySymbol(symbol, buyingPower);
+    } catch (error) {
+      errorLogger(`error buying ${symbol}`, error);
+    }
   }
 };

@@ -10,6 +10,7 @@ import { buySymbols } from './buy';
 import closePositions from './closePositions';
 import { BARS_TIMEFRAME_STRING, CRYPTO_UNIVERSE } from './constants';
 import getPositions from './getPositions';
+import { updateStopLimitSellOrder } from './orders';
 
 const run = async () => {
   // clear existing logs
@@ -22,12 +23,18 @@ const run = async () => {
 
   // get current positions
   const cryptoPositions = await getPositions();
+  const cryptoSymbols = cryptoPositions.map((p) => p.symbol);
 
-  // get current positions
+  // close positions that have a sell signal
   const closedPositions = await closePositions(
     cryptoPositions,
     BARS_TIMEFRAME_STRING
   );
+
+  // update existing stop limit sell orders
+  for (const symbol of cryptoSymbols) {
+    await updateStopLimitSellOrder(symbol);
+  }
 
   // prevent further execution if we have no capital
   const availableCapital = await getBuyingPower();
@@ -38,7 +45,6 @@ const run = async () => {
 
   // determine what we can buy
   // parallel fetch historical data
-  const cryptoSymbols = cryptoPositions.map((p) => p.symbol);
   const symbolsToBuy = CRYPTO_UNIVERSE.filter(
     (symbol) =>
       !closedPositions.includes(symbol) && !cryptoSymbols.includes(symbol)
