@@ -109,6 +109,11 @@ export const buySymbols = async (symbols: string[]) => {
     }
   }
 
+  if (!symbolsToBuy.length) {
+    log('no symbols to buy - stopping execution');
+    return;
+  }
+
   // calculate buying power per symbol
   const buyingPower = (maxBuyingPower * 0.975) / symbolsToBuy.length;
   log(`buying power per symbol: ${buyingPower}`);
