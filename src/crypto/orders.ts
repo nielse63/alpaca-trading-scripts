@@ -65,6 +65,7 @@ export const createStopLimitSellOrder = async (
   price: number
 ) => {
   const stopLimitPrice = price * 0.985;
+  log(`creating stop limit sell order for ${symbol} at ${stopLimitPrice}`);
   await alpaca.createOrder({
     symbol,
     qty,
@@ -77,6 +78,7 @@ export const createStopLimitSellOrder = async (
 };
 
 export const updateStopLimitSellOrder = async (symbol: string) => {
+  log(`checking for stop limit order update for ${symbol}`);
   const orders = await getSellOrdersForSymbol(symbol);
   const blacklistStatuses = [
     'accepted',
