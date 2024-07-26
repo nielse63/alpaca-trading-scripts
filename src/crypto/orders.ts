@@ -1,5 +1,5 @@
 import alpaca from '../alpaca';
-import { error as errorLogger, log, toDecimal } from '../helpers';
+import { error as errorLogger, log } from '../helpers';
 import { AlpacaOrder } from '../types.d';
 import { STOP_LIMIT_PERCENT } from './constants';
 import { AlpacaQuoteObject } from './types.d';
@@ -81,15 +81,15 @@ export const createStopLimitSellOrder = async (
 
 export const updateSingleStopLimitSellOrder = async (order: AlpacaOrder) => {
   const { symbol, limit_price: limitPrice } = order;
-  const oldStopLimitPrice = toDecimal(limitPrice);
+  const oldStopLimitPrice = parseFloat(limitPrice);
   const quote: Map<string, AlpacaQuoteObject> =
     await alpaca.getLatestCryptoQuotes([symbol]);
   const { BidPrice: bidPrice } = quote.get(symbol) as AlpacaQuoteObject;
-  const newStopLimitPrice = toDecimal(bidPrice * STOP_LIMIT_PERCENT);
+  const newStopLimitPrice = bidPrice * STOP_LIMIT_PERCENT;
   if (newStopLimitPrice <= oldStopLimitPrice) {
-    // log(
-    //   `no update needed for ${symbol}: ${newStopLimitPrice} <= ${oldStopLimitPrice}`
-    // );
+    log(
+      `no update needed for ${symbol}: ${newStopLimitPrice} <= ${oldStopLimitPrice}`
+    );
     return;
   }
   log(
