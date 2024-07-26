@@ -63,6 +63,8 @@ type IBar = AlpacaBar & BarSMA;
 export type AlpacaOrder = {
   filled_qty: string;
   filled_avg_price: string;
+  symbol: string;
+  limit_price: string;
   [key: string]: string | number | boolean;
 };
 

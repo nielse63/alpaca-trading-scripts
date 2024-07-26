@@ -1,5 +1,6 @@
 import alpaca from '../alpaca';
 import { error as errorLogger, log, toDecimal } from '../helpers';
+import { AlpacaOrder } from '../types.d';
 import { STOP_LIMIT_PERCENT } from './constants';
 import { AlpacaQuoteObject } from './types.d';
 
@@ -78,6 +79,32 @@ export const createStopLimitSellOrder = async (
   });
 };
 
+export const updateSingleStopLimitSellOrder = async (order: AlpacaOrder) => {
+  const { symbol, limit_price: limitPrice } = order;
+  const oldStopLimitPrice = toDecimal(limitPrice);
+  const quote: Map<string, AlpacaQuoteObject> =
+    await alpaca.getLatestCryptoQuotes([symbol]);
+  const { BidPrice: bidPrice } = quote.get(symbol) as AlpacaQuoteObject;
+  const newStopLimitPrice = toDecimal(bidPrice * STOP_LIMIT_PERCENT);
+  if (newStopLimitPrice <= oldStopLimitPrice) {
+    // log(
+    //   `no update needed for ${symbol}: ${newStopLimitPrice} <= ${oldStopLimitPrice}`
+    // );
+    return;
+  }
+  log(
+    `updating stop limit order for ${symbol} from ${oldStopLimitPrice} to ${newStopLimitPrice}`
+  );
+  try {
+    await alpaca.replaceOrder(order.id, {
+      limit_price: newStopLimitPrice,
+      stop_price: newStopLimitPrice,
+    });
+  } catch (error: any) {
+    errorLogger('error updating stop limit order', error?.response?.data);
+  }
+};
+
 export const updateStopLimitSellOrder = async (symbol: string) => {
   log(`checking for stop limit order update for ${symbol}`);
   let orders = [];
@@ -117,27 +144,6 @@ export const updateStopLimitSellOrder = async (symbol: string) => {
     );
     return;
   }
-  const [stopLimitOrder] = stopLimitOrders;
-  const oldStopLimitPrice = toDecimal(stopLimitOrder.limit_price);
-  const quote: Map<string, AlpacaQuoteObject> =
-    await alpaca.getLatestCryptoQuotes([symbol]);
-  const { BidPrice: bidPrice } = quote.get(symbol) as AlpacaQuoteObject;
-  const newStopLimitPrice = toDecimal(bidPrice * STOP_LIMIT_PERCENT);
-  if (newStopLimitPrice <= oldStopLimitPrice) {
-    log(
-      `no update needed for ${symbol}: ${newStopLimitPrice} <= ${oldStopLimitPrice}`
-    );
-    return;
-  }
-  log(
-    `updating stop limit order for ${symbol} from ${oldStopLimitPrice} to ${newStopLimitPrice}`
-  );
-  try {
-    await alpaca.replaceOrder(stopLimitOrder.id, {
-      limit_price: newStopLimitPrice,
-      stop_price: newStopLimitPrice,
-    });
-  } catch (error: any) {
-    errorLogger('error updating stop limit order', error?.response?.data);
-  }
+  const promises = stopLimitOrders.map(updateSingleStopLimitSellOrder);
+  await Promise.all(promises);
 };
