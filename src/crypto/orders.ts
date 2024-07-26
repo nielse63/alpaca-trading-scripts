@@ -1,7 +1,7 @@
 import alpaca from '../alpaca';
 import { error as errorLogger, log, toDecimal } from '../helpers';
-import { AlpacaQuoteObject } from './types.d';
 import { STOP_LIMIT_PERCENT } from './constants';
+import { AlpacaQuoteObject } from './types.d';
 
 export const getAllOrders = async () => {
   // @ts-ignore
@@ -80,7 +80,16 @@ export const createStopLimitSellOrder = async (
 
 export const updateStopLimitSellOrder = async (symbol: string) => {
   log(`checking for stop limit order update for ${symbol}`);
-  const orders = await getSellOrdersForSymbol(symbol);
+  let orders = [];
+  try {
+    orders = await getSellOrdersForSymbol(symbol);
+  } catch (error: any) {
+    errorLogger(
+      `error getting sell orders for ${symbol}`,
+      error?.response?.toJSON()
+    );
+    return;
+  }
   const blacklistStatuses = [
     'accepted',
     'pending_new',
@@ -91,7 +100,16 @@ export const updateStopLimitSellOrder = async (symbol: string) => {
     (o: any) => o.type === 'stop_limit' && !blacklistStatuses.includes(o.status)
   );
   if (!stopLimitOrders.length) {
-    const position = await alpaca.getPosition(symbol);
+    let position;
+    try {
+      position = await alpaca.getPosition(symbol.replace('/', ''));
+    } catch (error: any) {
+      errorLogger(
+        `error getting position for ${symbol}`,
+        error?.response?.toJSON()
+      );
+      return;
+    }
     await createStopLimitSellOrder(
       symbol,
       parseFloat(position.qty),
