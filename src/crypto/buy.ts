@@ -64,18 +64,16 @@ export const buySymbol = async (symbol: string, buyingPower: number) => {
       const buyOrder = await alpaca.createOrder(buyConfig);
       log(`buy order for ${symbol} created:`, buyOrder);
       if (buyConfig.type === 'market') {
-        await waitForOrderFill(buyOrder.id);
-        const filledQty =
-          parseFloat(buyOrder.filled_qty) > 0
-            ? parseFloat(buyOrder.filled_qty)
-            : parseFloat(buyOrder.filled_qty) > 0
-              ? parseFloat(buyOrder.filled_qty)
-              : buyQty;
+        const {
+          filled_qty: buyFilledQty,
+          filled_avg_price: buyFilledAvgPrice,
+        } = await waitForOrderFill(buyOrder.id);
+        const filledQty = parseFloat(buyFilledQty) || buyQty;
         try {
           await createStopLimitSellOrder(
             symbol,
             filledQty,
-            parseFloat(buyOrder.filled_avg_price)
+            parseFloat(buyFilledAvgPrice)
           );
         } catch (e: any) {
           errorLogger(`error creating stop limit sell order for ${symbol}`, e);

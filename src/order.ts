@@ -4,6 +4,7 @@ import { applyIndicators, applySignals } from './bars';
 import getStockBars from './getStockBars';
 import { SYMBOL, TRAILING_STOP_LOSS_PERCENT } from './constants';
 import { log } from './helpers';
+import { AlpacaOrder } from './types.d';
 
 export const getBarsWithSignals = async (symbol: string, timeframe: string) => {
   const bars = await getStockBars(symbol, timeframe);
@@ -13,7 +14,7 @@ export const getBarsWithSignals = async (symbol: string, timeframe: string) => {
   return barsWithSignals;
 };
 
-export const waitForOrderFill = (orderId: string) =>
+export const waitForOrderFill = (orderId: string): Promise<AlpacaOrder> =>
   new Promise((resolve, reject) => {
     log(`[info] waiting for order ${orderId} to fill`);
     const getBuyOrderInterval = setInterval(async () => {

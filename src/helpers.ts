@@ -7,6 +7,11 @@ export const isNumeric = (value: unknown) => {
   return !isNaN(Number(value)) && !isNaN(parseFloat(value));
 };
 
+export const toDecimal = (value: number | string, points: number = 2) => {
+  const numericValue = typeof value === 'string' ? parseFloat(value) : value;
+  return parseFloat(`${numericValue.toFixed(points)}`);
+};
+
 export const parseResponseObject = (object = {}): any => {
   return Object.entries(object).reduce(
     (previousValue, [key, value]) => {
