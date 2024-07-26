@@ -90,6 +90,12 @@ export const updateStopLimitSellOrder = async (symbol: string) => {
     (o: any) => o.type === 'stop_limit' && !blacklistStatuses.includes(o.status)
   );
   if (!stopLimitOrders.length) {
+    const position = await alpaca.getPosition(symbol);
+    await createStopLimitSellOrder(
+      symbol,
+      parseFloat(position.qty),
+      parseFloat(position.avg_entry_price)
+    );
     return;
   }
   const [stopLimitOrder] = stopLimitOrders;
