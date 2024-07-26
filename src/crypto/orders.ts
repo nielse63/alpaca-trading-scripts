@@ -102,12 +102,6 @@ export const updateStopLimitSellOrder = async (symbol: string) => {
   log(
     `updating stop limit order for ${symbol} from ${oldStopLimitPrice} to ${newStopLimitPrice}`
   );
-  console.log({
-    symbol,
-    bidPrice,
-    oldStopLimitPrice,
-    newStopLimitPrice,
-  });
   try {
     await alpaca.replaceOrder(stopLimitOrder.id, {
       limit_price: newStopLimitPrice,

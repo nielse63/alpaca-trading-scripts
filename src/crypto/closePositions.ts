@@ -2,8 +2,8 @@ import alpaca from '../alpaca';
 import { getBarsWithSignals } from '../bars';
 import { error, log } from '../helpers';
 import { BARS_TIMEFRAME_STRING, IS_DEV } from './constants';
-import { AlpacaPosition } from './types.d';
 import { deleteOrdersForSymbol } from './orders';
+import { AlpacaPosition } from './types.d';
 
 const closePositions = async (
   positions: AlpacaPosition[],
@@ -12,7 +12,7 @@ const closePositions = async (
   const closedPositions = [];
   for (const position of positions) {
     const { symbol, asset_id: assetId } = position;
-    console.log(`checking ${symbol} for close signal`);
+    log(`checking ${symbol} for close signal`);
     const barsWithSignals = await getBarsWithSignals(symbol, timeframe);
     if (!barsWithSignals.signals.sell) {
       continue;

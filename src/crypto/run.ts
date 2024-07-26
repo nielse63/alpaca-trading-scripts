@@ -46,8 +46,7 @@ const run = async () => {
   // determine what we can buy
   // parallel fetch historical data
   const symbolsToBuy = CRYPTO_UNIVERSE.filter(
-    (symbol) =>
-      !closedPositions.includes(symbol) && !cryptoSymbols.includes(symbol)
+    (symbol) => !closedPositions.includes(symbol)
   );
   await buySymbols(symbolsToBuy);
 };

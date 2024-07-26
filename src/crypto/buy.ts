@@ -84,6 +84,8 @@ export const buySymbols = async (symbols: string[]) => {
     log('no available capital');
     return;
   }
+
+  // buy symbols
   for (const symbol of symbols) {
     try {
       await deleteBuyOrdersForSymbol(symbol);
