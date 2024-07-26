@@ -99,6 +99,9 @@ export const updateStopLimitSellOrder = async (symbol: string) => {
   const { BidPrice: bidPrice } = quote.get(symbol) as AlpacaQuoteObject;
   const newStopLimitPrice = bidPrice * 0.99;
   if (newStopLimitPrice <= oldStopLimitPrice) {
+    log(
+      `no update needed for ${symbol}: ${newStopLimitPrice} <= ${oldStopLimitPrice}`
+    );
     return;
   }
   log(
