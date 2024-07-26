@@ -15,6 +15,7 @@
     "test:coverage": "npm test -- --coverage",
     "prepare": "husky || true",
     "start": ".bin/run",
+    "restart": ".bin/restart",
     "dev": "ts-node src/index.ts",
     "lint": "eslint --fix . && prettier --write .",
     "prebuild": "rm -rf dist/",

@@ -1,0 +1,15 @@
+.git/
+# .husky/
+.github/
+.env
+node_modules/
+.vscode/
+coverage/
+dist/
+# .prettierignore
+# .prettierrc
+# .editorconfig
+# .env.sample
+# .env.test
+# .eslintignore
+# .eslintrc

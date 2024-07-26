@@ -1,5 +1,5 @@
 import alpaca from '../alpaca';
-import { error as errorLogger, log } from '../helpers';
+import { error as errorLogger, log, toDecimal } from '../helpers';
 import { AlpacaOrder } from '../types.d';
 import { STOP_LIMIT_PERCENT } from './constants';
 import { AlpacaQuoteObject } from './types.d';
@@ -61,21 +61,37 @@ export const deleteBuyOrdersForSymbol = async (symbol: string) => {
   }
 };
 
+export const deleteSellOrdersForSymbol = async (symbol: string) => {
+  const orders = await getSellOrdersForSymbol(symbol);
+  if (!orders.length) {
+    return;
+  }
+  const promises = orders.map((o: any) => alpaca.cancelOrder(o.id));
+  try {
+    log(`deleting ${promises.length} sell orders for ${symbol}`);
+    await Promise.all(promises);
+  } catch (error: any) {
+    errorLogger('error deleting buy orders', error?.response?.data);
+  }
+};
+
 export const createStopLimitSellOrder = async (
   symbol: string,
   qty: number,
   price: number
 ) => {
-  const stopLimitPrice = price * STOP_LIMIT_PERCENT;
-  log(`creating stop limit sell order for ${symbol} at ${stopLimitPrice}`);
+  const decimalPoints = price >= 1 ? 2 : 4;
+  const stopPrice = toDecimal(price, decimalPoints);
+  log(`creating stop limit sell order for ${symbol} at ${stopPrice}`);
   await alpaca.createOrder({
-    symbol,
-    qty,
     side: 'sell',
     type: 'stop_limit',
     time_in_force: 'gtc',
-    limit_price: stopLimitPrice,
-    stop_price: stopLimitPrice,
+    symbol,
+    qty,
+    stop_price: stopPrice,
+    limit_price: stopPrice,
+    position_intent: 'sell_to_close',
   });
 };
 
@@ -92,11 +108,13 @@ export const updateSingleStopLimitSellOrder = async (order: AlpacaOrder) => {
     );
     return;
   }
+  const { qty } = await alpaca.getPosition(order.asset_id);
   log(
     `updating stop limit order for ${symbol} from ${oldStopLimitPrice} to ${newStopLimitPrice}`
   );
   try {
     await alpaca.replaceOrder(order.id, {
+      qty,
       limit_price: newStopLimitPrice,
       stop_price: newStopLimitPrice,
     });
@@ -140,7 +158,7 @@ export const updateStopLimitSellOrder = async (symbol: string) => {
     await createStopLimitSellOrder(
       symbol,
       parseFloat(position.qty),
-      parseFloat(position.avg_entry_price)
+      parseFloat(position.avg_entry_price) * STOP_LIMIT_PERCENT
     );
     return;
   }

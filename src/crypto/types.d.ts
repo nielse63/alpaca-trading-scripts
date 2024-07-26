@@ -4,7 +4,7 @@ export type AlpacaPosition = {
   exchange?: string;
   asset_class?: string;
   asset_marginable?: boolean;
-  qty?: string;
+  qty: string;
   avg_entry_price?: string;
   side?: string;
   market_value?: string;

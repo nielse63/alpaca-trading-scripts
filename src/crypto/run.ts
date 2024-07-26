@@ -23,13 +23,15 @@ const run = async () => {
 
   // get current positions
   const cryptoPositions = await getPositions();
-  const cryptoSymbols = cryptoPositions.map((p) => p.symbol);
 
   // close positions that have a sell signal
   const closedPositions = await closePositions(
     cryptoPositions,
     BARS_TIMEFRAME_STRING
   );
+  const cryptoSymbols = cryptoPositions
+    .map((position) => position.symbol)
+    .filter((symbol) => !closedPositions.includes(symbol));
 
   // update existing stop limit sell orders
   for (const symbol of cryptoSymbols) {
@@ -39,7 +41,7 @@ const run = async () => {
   // prevent further execution if we have no capital
   const availableCapital = await getBuyingPower();
   if (availableCapital < AVAILABLE_CAPITAL_THRESHOLD) {
-    log('no available capital');
+    log('not enough capital to buy - stopping execution');
     return;
   }
 

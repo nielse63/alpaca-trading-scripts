@@ -136,3 +136,4 @@ data/*
 !data/.gitkeep
 .vscode
 backtest.json
+.bin/rsync

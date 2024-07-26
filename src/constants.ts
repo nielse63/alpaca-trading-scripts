@@ -53,4 +53,4 @@ export const cache: ICacheObject = {
 };
 export const STDOUT_LOG_FILE = path.resolve(__dirname, '../stdout.log');
 export const STDERR_LOG_FILE = path.resolve(__dirname, '../stderr.log');
-export const AVAILABLE_CAPITAL_THRESHOLD = 10;
+export const AVAILABLE_CAPITAL_THRESHOLD = 5;
