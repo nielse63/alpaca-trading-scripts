@@ -9,15 +9,15 @@ import { createStopLimitSellOrder, deleteBuyOrdersForSymbol } from './orders';
 import { AlpacaQuoteObject } from './types.d';
 
 export const buySymbol = async (symbol: string, buyingPower: number) => {
-  log(`evaluating buy signals for: ${symbol}`);
-  const barWithSignals = await getBarsWithSignals(symbol);
-  const { signals } = barWithSignals;
-  const shouldBuy = signals.buy;
+  // log(`evaluating buy signals for: ${symbol}`);
+  // const barWithSignals = await getBarsWithSignals(symbol);
+  // const { signals } = barWithSignals;
+  // const shouldBuy = signals.buy;
 
-  log(`signals for ${symbol}:`, signals);
-  if (!shouldBuy) {
-    return;
-  }
+  // log(`signals for ${symbol}:`, signals);
+  // if (!shouldBuy) {
+  //   return;
+  // }
 
   // const availableCapital = await getBuyingPower();
   // const buyingPower = parseFloat(
@@ -90,15 +90,31 @@ export const buySymbol = async (symbol: string, buyingPower: number) => {
 
 export const buySymbols = async (symbols: string[]) => {
   const maxBuyingPower = await getBuyingPower();
-  const buyingPower = (maxBuyingPower * 0.975) / symbols.length;
-  log(`buying power per symbol: ${buyingPower}`);
-  if (buyingPower < AVAILABLE_CAPITAL_THRESHOLD) {
+  if (maxBuyingPower < AVAILABLE_CAPITAL_THRESHOLD) {
     log('no available capital');
     return;
   }
 
-  // buy symbols
+  // evaluate if we can buy
+  const symbolsToBuy = [];
   for (const symbol of symbols) {
+    log(`evaluating buy signals for: ${symbol}`);
+    const barWithSignals = await getBarsWithSignals(symbol);
+    const { signals } = barWithSignals;
+    const shouldBuy = signals.buy;
+
+    log(`signals for ${symbol}:`, signals);
+    if (shouldBuy) {
+      symbolsToBuy.push(symbol);
+    }
+  }
+
+  // calculate buying power per symbol
+  const buyingPower = (maxBuyingPower * 0.975) / symbolsToBuy.length;
+  log(`buying power per symbol: ${buyingPower}`);
+
+  // buy symbols
+  for (const symbol of symbolsToBuy) {
     try {
       await deleteBuyOrdersForSymbol(symbol);
     } catch (error) {

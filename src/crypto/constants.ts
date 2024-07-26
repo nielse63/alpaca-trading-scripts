@@ -8,6 +8,7 @@ export const BARS_TIMEFRAME_MINUTES = 5;
 export const BARS_TIMEFRAME_STRING = '5Min';
 export const IS_DEV =
   process.env.NODE_ENV === undefined || process.env.NODE_ENV === 'development';
+export const STOP_LIMIT_PERCENT = 0.99;
 export const CRYPTO_UNIVERSE = [
   // 'AAVE',
   'AVAX',
