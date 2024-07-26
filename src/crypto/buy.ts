@@ -47,9 +47,10 @@ export const buySymbol = async (symbol: string, buyingPower: number) => {
 
   // place buy order
   try {
+    const buyQty = parseFloat(qty.toFixed(4));
     const buyConfig = {
       symbol: symbol,
-      qty: parseFloat(qty.toFixed(4)),
+      qty: buyQty,
       side: 'buy',
       type: 'market',
       time_in_force: 'gtc',
@@ -61,13 +62,24 @@ export const buySymbol = async (symbol: string, buyingPower: number) => {
     if (!IS_DEV) {
       await alpaca.cancelAllOrders();
       const buyOrder = await alpaca.createOrder(buyConfig);
+      log(`buy order for ${symbol} created:`, buyOrder);
       if (buyConfig.type === 'market') {
         await waitForOrderFill(buyOrder.id);
-        await createStopLimitSellOrder(
-          symbol,
-          parseFloat(buyOrder.filled_qty),
-          parseFloat(buyOrder.filled_avg_price)
-        );
+        const filledQty =
+          parseFloat(buyOrder.filled_qty) > 0
+            ? parseFloat(buyOrder.filled_qty)
+            : parseFloat(buyOrder.filled_qty) > 0
+              ? parseFloat(buyOrder.filled_qty)
+              : buyQty;
+        try {
+          await createStopLimitSellOrder(
+            symbol,
+            filledQty,
+            parseFloat(buyOrder.filled_avg_price)
+          );
+        } catch (e: any) {
+          errorLogger(`error creating stop limit sell order for ${symbol}`, e);
+        }
       }
     }
     log(`buy order for ${symbol} completed successfully`);
