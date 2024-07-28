@@ -108,7 +108,16 @@ export const updateSingleStopLimitSellOrder = async (order: AlpacaOrder) => {
     );
     return;
   }
-  const { qty } = await alpaca.getPosition(order.asset_id);
+  let qty;
+  try {
+    const position = await alpaca.getPosition(symbol.replace('/', ''));
+    qty = parseFloat(position.qty);
+  } catch (error: any) {
+    errorLogger(
+      `error getting position for ${symbol} (updateSingleStopLimitSellOrder)`,
+      error?.response?.data
+    );
+  }
   log(
     `updating stop limit order for ${symbol} from ${oldStopLimitPrice} to ${newStopLimitPrice}`
   );
@@ -131,7 +140,7 @@ export const updateStopLimitSellOrder = async (symbol: string) => {
   } catch (error: any) {
     errorLogger(
       `error getting sell orders for ${symbol}`,
-      error?.response?.toJSON()
+      error?.response?.data
     );
     return;
   }
@@ -151,7 +160,7 @@ export const updateStopLimitSellOrder = async (symbol: string) => {
     } catch (error: any) {
       errorLogger(
         `error getting position for ${symbol}`,
-        error?.response?.toJSON()
+        error?.response?.data
       );
       return;
     }

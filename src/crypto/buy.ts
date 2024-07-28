@@ -90,9 +90,11 @@ export const buySymbol = async (symbol: string, buyingPower: number) => {
 
 export const buySymbols = async (symbols: string[]) => {
   // close open buy orders for all symbols
-  const promises = symbols.map((symbol) => deleteBuyOrdersForSymbol(symbol));
+  const deletePromises = symbols.map((symbol) =>
+    deleteBuyOrdersForSymbol(symbol)
+  );
   try {
-    await Promise.all(promises);
+    await Promise.all(deletePromises);
   } catch (error: any) {
     errorLogger(
       'error deleting buy orders for all symbols',
@@ -102,25 +104,24 @@ export const buySymbols = async (symbols: string[]) => {
 
   // calculate buying power per symbol
   const maxBuyingPower = await getBuyingPower();
+  if (maxBuyingPower < AVAILABLE_CAPITAL_THRESHOLD) {
+    log('not enough capital to buy - stopping execution');
+    return;
+  }
 
   // evaluate if we can buy
-  const symbolsToBuy = [];
-  for (const symbol of symbols) {
-    log(`evaluating buy signals for: ${symbol}`);
-    const barWithSignals = await getBarsWithSignals(symbol);
-    const { signals } = barWithSignals;
-    const shouldBuy = signals.buy;
-
-    log(`signals for ${symbol}:`, signals);
-    if (shouldBuy) {
-      symbolsToBuy.push(symbol);
-    }
-  }
+  const barPromises = symbols.map((symbol) => getBarsWithSignals(symbol));
+  const barsWithSignals = await Promise.all(barPromises);
+  const symbolsToBuy = barsWithSignals
+    .filter((bar) => bar.signals.buy)
+    .map((bar) => bar.symbol);
 
   if (!symbolsToBuy.length) {
     log('no symbols to buy - stopping execution');
     return;
   }
+
+  log(`symbols to buy: ${symbolsToBuy.join(', ')}`);
 
   // calculate buying power per symbol
   const buyingPower = maxBuyingPower / symbolsToBuy.length;

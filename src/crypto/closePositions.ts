@@ -18,29 +18,17 @@ const closePositions = async (
     if (!signals.sell) {
       continue;
     }
-    try {
-      closedPositions.push(symbol);
-      log(`closing all posiitons for ${symbol}`);
-      if (!IS_DEV) {
-        // close the position
-        // const { close: sellPrice } = data[data.length - 1];
-        // const qty = parseFloat(position.qty);
-        // await createStopLimitSellOrder(symbol, qty, sellPrice);
-        // const quotes = await alpaca.getLatestCryptoQuotes([symbol]);
-        // const quote = quotes.get(symbol);
-        // log('quote (closePositions)', quote);
-        try {
-          // delete all open orders for the symbol
-          await deleteOrdersForSymbol(symbol);
-          // close positions
-          await alpaca.closePosition(assetId);
-        } catch (e: any) {
-          error(`error closing position for ${symbol}`, e?.response?.data);
-        }
+    closedPositions.push(symbol);
+    log(`closing all posiitons for ${symbol}`);
+    if (!IS_DEV) {
+      try {
+        // delete all open orders for the symbol
+        await deleteOrdersForSymbol(symbol);
+        // close positions
+        await alpaca.closePosition(assetId);
+      } catch (e: any) {
+        error(`error closing position for ${symbol}`, e?.response?.data);
       }
-    } catch (e: any) {
-      console.error(e?.response?.data);
-      error(e);
     }
   }
   return closedPositions;

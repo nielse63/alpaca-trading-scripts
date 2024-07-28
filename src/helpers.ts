@@ -57,3 +57,14 @@ export const error = async (message?: any, ...optionalParams: any[]) => {
   console.error(date, message, ...optionalParams);
   // logToFile(msg, STDERR_LOG_FILE);
 };
+
+export const timeframeToSeconds = (timeframe: string) => {
+  const numberValue = parseFloat(timeframe.replace(/\D/g, ''));
+  if (timeframe.toLowerCase().includes('hour')) {
+    return numberValue * 60 * 60;
+  } else if (timeframe.toLowerCase().includes('day')) {
+    return numberValue * 60 * 60 * 24;
+  } else {
+    return numberValue * 60;
+  }
+};

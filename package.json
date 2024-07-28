@@ -48,13 +48,9 @@
     "dotenv": "^16.4.5",
     "fs-extra": "^11.2.0",
     "lodash.findlastindex": "^4.6.0",
-    "log-to-file": "^3.0.3",
     "moment": "^2.30.1",
-    "node-cron": "^3.0.3",
     "pm2": "^5.4.2",
-    "technicalindicators": "^3.1.0",
-    "trading-signals": "^3.7.0",
-    "trend": "^0.3.0"
+    "trading-signals": "^3.7.0"
   },
   "devDependencies": {
     "@babel/core": "^7.24.9",
@@ -87,7 +83,10 @@
     "typescript": "^5.5.4"
   },
   "lint-staged": {
-    "*.{ts,js,json,md}": "prettier --write",
-    "*.{ts,js}": "eslint --fix"
+    "*.{json,md}": "prettier --write --cache",
+    "*.{ts,js}": [
+      "eslint --fix --cache",
+      "prettier --write --cache"
+    ]
   }
 }

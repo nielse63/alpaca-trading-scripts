@@ -137,3 +137,4 @@ data/*
 .vscode
 backtest.json
 .bin/rsync
+*.*cache

@@ -7,7 +7,6 @@ export const MACD_SHORT_INTERVAL = 12;
 export const MACD_LONG_INTERVAL = 26;
 export const MACD_SIGNAL_INTERVAL = 9;
 export const RSI_INTERVAL = 14;
-export const BARS_TIMEFRAME_MINUTES = 5;
 export const BARS_TIMEFRAME_STRING = '5Min';
 export const ALPACA_URL = process.env?.ALPACA_URL;
 export const IS_DEV =

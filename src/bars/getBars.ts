@@ -8,7 +8,7 @@ const getBars = async (
   timeframe: string = BARS_TIMEFRAME_STRING
 ): Promise<BarObject[]> => {
   const end = new Date();
-  const limit = 150;
+  const limit = 50;
   let subFn = subMinutes;
   if (timeframe.includes('Hour')) {
     subFn = subHours;
