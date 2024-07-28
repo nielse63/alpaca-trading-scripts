@@ -4,10 +4,17 @@ module.exports = {
       name: 'crypto',
       script: 'dist/crypto/cron.js',
       instances: 1,
-      // cron_restart: '*/15 * * * *',
       watch: ['dist'],
       env: {
         NODE_ENV: 'production',
+      },
+    },
+    {
+      name: 'server',
+      script: 'app/bin/www',
+      env: {
+        NODE_ENV: 'production',
+        DEBUG: '*',
       },
     },
   ],
