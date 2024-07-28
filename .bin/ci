@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+set -e
+
+function trash {
+    local src=$1
+
+    # guards
+    if ! [ -e "$src" ]; then
+        return
+    fi
+
+    # move to trash if possible
+    if [ -e "$HOME/.Trash" ]; then
+      src_basename=$(basename "$src")
+      now=$(date +%s)
+      mv "$src" "$HOME/.Trash/${src_basename}_${now}_${RANDOM}"
+    else
+      rm -rf "$src" &
+    fi
+}
+
+node_modules=$(find . -name 'node_modules' -type d -maxdepth 2)
+for dir in $node_modules; do
+  dir=$(dirname "$dir")
+  echo "Removing node_modules in $dir"
+  trash node_modules
+done
+package_files=$(find . -name 'package.json')
+
+for file in $package_files; do
+  dir=$(dirname "$file")
+  if [[ $dir == *"node_modules"* ]]; then
+    continue
+  fi
+  echo "Installing dependencies in $dir"
+  cd "$dir"
+  if [ -f "$dir/package-lock.json" ]; then
+    npm ci
+  else
+    npm i
+  fi
+done

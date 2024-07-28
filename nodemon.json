@@ -1,9 +1,0 @@
-{
-  "verbose": true,
-  "ignore": ["**/*.spec.js"],
-  "watch": ["app", "app/bin/www"],
-  "env": {
-    "DEBUG": "*"
-  },
-  "ext": "js,json"
-}

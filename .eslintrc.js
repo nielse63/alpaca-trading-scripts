@@ -5,43 +5,19 @@ module.exports = {
     browser: true,
     jest: true,
   },
-  plugins: [
-    // '@typescript-eslint',
-    'import',
-    'prettier',
-    'jest',
-    'jest-extended',
-  ],
-  extends: [
-    // 'airbnb-typescript/base',
-    'prettier',
-    'plugin:jest/recommended',
-    // 'plugin:@typescript-eslint/recommended',
-    // 'plugin:import/typescript',
-    'plugin:jest-extended/all',
-  ],
-  // parser: '@typescript-eslint/parser',
-  // parserOptions: {
-  //   project: './tsconfig.eslint.json',
-  // },
+  parserOptions: {
+    ecmaVersion: 2024,
+  },
+  plugins: ['import'],
+  extends: ['eslint:recommended', 'airbnb-base', 'prettier'],
   rules: {
-    'import/extensions': [
-      'error',
-      'ignorePackages',
-      {
-        js: 'never',
-        jsx: 'never',
-        ts: 'never',
-        tsx: 'never',
-      },
-    ],
+    'no-console': ['error', { allow: ['warn', 'error'] }],
   },
   overrides: [
     {
       files: [
         '.bin/**/*',
         '**/*.spec.{js,ts}',
-        '*.d.ts',
         '**/__mocks__/**',
         '**/__tests__/**',
         '**/__fixtures__/**',
@@ -50,38 +26,6 @@ module.exports = {
         'import/no-extraneous-dependencies': 'off',
         'no-underscore-dangle': 'off',
         'no-console': 'off',
-      },
-    },
-    {
-      files: ['**/*.spec.{js,ts}'],
-      rules: {
-        '@typescript-eslint/no-var-requires': 'warn',
-      },
-    },
-    {
-      files: ['src/**/*.ts'],
-      plugins: ['@typescript-eslint'],
-      extends: [
-        'airbnb-typescript/base',
-        'plugin:import/typescript',
-        'plugin:@typescript-eslint/recommended',
-      ],
-      parser: '@typescript-eslint/parser',
-      parserOptions: {
-        project: './tsconfig.eslint.json',
-      },
-      rules: {
-        '@typescript-eslint/ban-ts-comment': 'warn',
-        '@typescript-eslint/lines-between-class-members': [
-          'warn',
-          'always',
-          {
-            exceptAfterSingleLine: true,
-          },
-        ],
-        '@typescript-eslint/no-unused-vars': 'error',
-        '@typescript-eslint/no-var-requires': 'warn',
-        '@typescript-eslint/no-explicit-any': 'warn',
       },
     },
   ],
