@@ -41,7 +41,7 @@
     "node": ">=22.2.0"
   },
   "dependencies": {
-    "@alpacahq/alpaca-trade-api": "^3.1.1",
+    "@alpacahq/alpaca-trade-api": "^3.1.2",
     "date-fns": "^3.6.0",
     "dotenv": "^16.4.5",
     "fs-extra": "^11.2.0",
