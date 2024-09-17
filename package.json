@@ -42,7 +42,7 @@
   },
   "dependencies": {
     "@alpacahq/alpaca-trade-api": "^3.1.2",
-    "date-fns": "^3.6.0",
+    "date-fns": "^4.1.0",
     "dotenv": "^16.4.5",
     "fs-extra": "^11.2.0",
     "lodash.findlastindex": "^4.6.0",
