@@ -51,7 +51,7 @@
     "node-cron": "^4.0.5",
     "pm2": "^6.0.6",
     "technicalindicators": "^3.1.0",
-    "trading-signals": "3.7.0"
+    "trading-signals": "6.6.2"
   },
   "devDependencies": {
     "@babel/core": "^7.27.1",
