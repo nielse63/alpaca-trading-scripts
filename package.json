@@ -49,7 +49,7 @@
     "log-to-file": "^3.0.3",
     "moment": "^2.30.1",
     "node-cron": "^4.1.0",
-    "pm2": "^6.0.6",
+    "pm2": "^6.0.8",
     "technicalindicators": "^3.1.0",
     "trading-signals": "3.7.0"
   },
