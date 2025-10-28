@@ -38,7 +38,7 @@
   },
   "homepage": "https://github.com/nielse63/alpaca-trading-scripts#readme",
   "engines": {
-    "node": ">=22.2.0"
+    "node": ">=22.21.0"
   },
   "dependencies": {
     "@alpacahq/alpaca-trade-api": "^3.1.3",
