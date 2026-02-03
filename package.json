@@ -54,8 +54,8 @@
     "trading-signals": "3.7.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.28.6",
-    "@babel/preset-env": "^7.28.6",
+    "@babel/core": "^7.29.0",
+    "@babel/preset-env": "^7.29.0",
     "@babel/preset-typescript": "^7.28.5",
     "@types/fs-extra": "^11.0.4",
     "@types/jest": "^29.5.14",
