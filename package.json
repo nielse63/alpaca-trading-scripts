@@ -80,7 +80,7 @@
     "moment-business": "^3.0.1",
     "prettier": "^3.10.1",
     "ts-node": "^10.9.2",
-    "typescript": "^6.0.3"
+    "typescript": "^7.0.2"
   },
   "lint-staged": {
     "*.{ts,js,json,md}": "prettier --write",
